@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://sahilansari-ui.github.io/notepress/sitemap.xml
