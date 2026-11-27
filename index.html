@@ -3,187 +3,349 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NotePress Pro — Smart Blackboard Notes to Printable PDF</title>
+  <title>NotePress Pro — Smart Blackboard Notes to Big-Font Printable Book</title>
+  <meta name="description" content="Convert 400+ page PW, Unacademy, Allen dark blackboard PDFs into crisp, big-font, low-cost printable A4 study notes. 100% free & private browser tool." />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; }
-    .a4-canvas { box-shadow: 0 10px 30px rgba(0,0,0,0.35); background: #fff; }
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .a4-canvas { box-shadow: 0 15px 40px rgba(0,0,0,0.5); background: #fff; transition: width 0.2s ease; }
+    .a4-fit { max-width: 100%; height: auto; }
+    .a4-actual { width: 794px; max-width: none; height: auto; }
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
 
-  <!-- Header -->
-  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-30">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+  <!-- Navbar -->
+  <header class="border-b border-slate-800/90 bg-slate-900/90 backdrop-blur sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center font-black text-white text-lg">N</div>
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center font-black text-white text-xl shadow-lg shadow-indigo-600/30">N</div>
         <div>
-          <h1 class="font-bold text-lg leading-tight tracking-tight">NotePress <span class="text-indigo-400">Pro</span></h1>
-          <p class="text-[11px] text-slate-400">Blackboard PDF → Big-Font Printable Book</p>
+          <div class="flex items-center gap-2">
+            <h1 class="font-extrabold text-lg leading-tight tracking-tight">NotePress <span class="text-indigo-400">Pro</span></h1>
+            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">v3 ENGINE</span>
+          </div>
+          <p class="text-[11px] text-slate-400">Blackboard Class PDF → Big-Font Printable Book</p>
         </div>
       </div>
-      <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-medium">
-        100% Free • Runs Offline in Browser
-      </span>
+
+      <div class="flex items-center gap-2 text-xs">
+        <span class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-medium">
+          🔒 100% Private • Runs Locally in Browser
+        </span>
+        <a href="#how-it-works" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium transition">How It Works</a>
+      </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+  <!-- Trust Highlight Strip -->
+  <div class="bg-gradient-to-r from-indigo-950/80 via-slate-900 to-violet-950/80 border-b border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-[11px] sm:text-xs text-slate-300">
+      <span>✅ <b>Zero Black Boxes</b> on White Cards</span>
+      <span>✅ <b>Internal Gap Squisher</b> (Save 75–85% Pages)</span>
+      <span>✅ <b>Anti-Tiny Handwriting</b> Auto Full-Width</span>
+      <span>✅ <b>₹0 Cost</b> • No Signup • No File Upload to Server</span>
+    </div>
+  </div>
 
-    <!-- Left Controls Panel -->
+  <!-- Main Workspace -->
+  <main class="max-w-7xl w-full mx-auto px-4 py-5 grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1">
+
+    <!-- Left Controls -->
     <section class="lg:col-span-4 space-y-4">
 
-      <!-- Upload Box -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">1. Upload Coaching / Board PDF</label>
-        <label id="dropZone" class="flex flex-col items-center justify-center border-2 border-dashed border-slate-700 hover:border-indigo-500 rounded-xl p-6 cursor-pointer transition bg-slate-950/60 text-center">
+      <!-- 1. Upload -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-xs font-bold uppercase tracking-wider text-slate-400">1. Upload Coaching PDF</label>
+          <span class="text-[10px] text-emerald-400">Supports 500+ Pages</span>
+        </div>
+        <label class="flex flex-col items-center justify-center border-2 border-dashed border-slate-700 hover:border-indigo-500 rounded-xl p-5 cursor-pointer transition bg-slate-950/70 text-center group">
           <input id="pdfInput" type="file" accept="application/pdf" class="hidden" />
-          <div class="text-3xl mb-1">📄</div>
-          <p id="fileNameLabel" class="text-sm font-medium text-slate-200">Click to select PDF (up to 500+ pages)</p>
-          <p id="fileMetaLabel" class="text-xs text-slate-400 mt-1">PW, Unacademy, Allen, SSC, NEET/JEE Notes</p>
+          <div class="text-3xl mb-1 group-hover:scale-110 transition">📄</div>
+          <p id="fileNameLabel" class="text-sm font-semibold text-slate-200 break-all">Click to Choose PDF File</p>
+          <p id="fileMetaLabel" class="text-xs text-slate-400 mt-1">PW, Unacademy, Allen, NEET / JEE / SSC Board Notes</p>
         </label>
       </div>
 
-      <!-- Smart Settings -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-4">
+      <!-- 2. Input Page Range -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-xl">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">2. Smart Print Settings</span>
-          <span class="text-[11px] text-indigo-400">Anti-Blackbox Engine ON</span>
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">2. Slide Range</span>
+          <button type="button" id="btnAllPages" class="text-[11px] px-2.5 py-0.5 rounded bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 font-semibold transition">Select All Pages</button>
         </div>
-
-        <!-- Page Range -->
-        <div>
-          <label class="block text-xs text-slate-300 mb-1 font-medium">Pages to Process (e.g. <code class="text-indigo-300">all</code> ya <code class="text-indigo-300">1-20, 102-115</code>)</label>
-          <input id="pageRange" type="text" value="1-15" placeholder="all or 1-20"
-            class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
-          <div class="flex gap-2 mt-1.5">
-            <button type="button" onclick="setRange('1-15')" class="text-[11px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">Demo (1-15)</button>
-            <button type="button" onclick="setRange('102-116')" class="text-[11px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">Graphs Test</button>
-            <button type="button" onclick="setRange('all')" class="text-[11px] px-2 py-0.5 rounded bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 font-medium">All Pages</button>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">From Slide</label>
+            <input id="fromPage" type="number" min="1" value="1"
+              class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-white focus:border-indigo-500 focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">To Slide</label>
+            <input id="toPage" type="number" min="1" value="25"
+              class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-white focus:border-indigo-500 focus:outline-none" />
           </div>
         </div>
+        <div class="flex flex-wrap gap-1.5">
+          <button type="button" onclick="quickRange(1, 25)" class="text-[11px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">Fast Demo (1-25)</button>
+          <button type="button" onclick="quickRange(34, 60)" class="text-[11px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">Handwriting Test (34-60)</button>
+          <button type="button" onclick="quickRange(102, 125)" class="text-[11px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">Graphs (102-125)</button>
+        </div>
+      </div>
 
-        <!-- Layout Mode -->
+      <!-- 3. Smart Readability & Packing Controls -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3.5 shadow-xl">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">3. Smart Readability Engine</span>
+          <span id="instantBadge" class="hidden text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-semibold">⚡ Instant Repack ON</span>
+        </div>
+
         <div>
-          <label class="block text-xs text-slate-300 mb-1 font-medium">Layout Mode (Font Size vs Pages)</label>
+          <label class="block text-xs text-slate-300 mb-1 font-medium">Layout Mode</label>
           <select id="layoutMode" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
-            <option value="flow-2" selected>2-Column Tetris Flow (Best: Max Saving + Big Font)</option>
-            <option value="flow-1">Book Flow — Extra Large Font (Pen-Friendly)</option>
-            <option value="grid-4">Clean Auto-Cropped 4-in-1 Grid</option>
-            <option value="grid-6">Clean Auto-Cropped 6-in-1 Grid</option>
+            <option value="smart-book" selected>🔥 Smart Adaptive Book (Big Handwriting + Min Pages)</option>
+            <option value="target">🎯 Custom Target Pages (Fix Exact Page Count)</option>
+            <option value="flow-2">🧩 Tight 2-Column Tetris (Max Page Saving)</option>
+            <option value="flow-1">📖 Extra-Large Pen Book (1-Column Big Font)</option>
           </select>
         </div>
 
-        <!-- Ink & Color -->
+        <!-- Custom Target Pages Box -->
+        <div id="targetBox" class="hidden bg-indigo-950/40 border border-indigo-500/40 rounded-xl p-3 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-semibold text-indigo-200">Target A4 Pages:</label>
+            <input id="targetPages" type="number" min="1" max="500" value="45"
+              class="w-20 text-center bg-slate-950 border border-indigo-400 rounded-lg px-2 py-1 text-sm font-bold text-white focus:outline-none" />
+          </div>
+          <p class="text-[11px] text-indigo-300/80">Tool automatically scales to hit your exact page budget.</p>
+        </div>
+
+        <!-- Readability Boost Slider (for smart-book) -->
+        <div id="sizeSliderBox" class="bg-slate-950/70 border border-slate-800 rounded-xl p-3 space-y-1.5">
+          <div class="flex justify-between text-xs">
+            <span class="text-slate-300 font-medium">Text / Handwriting Size</span>
+            <span id="sizeLabel" class="font-bold text-indigo-400">Balanced (Recommended)</span>
+          </div>
+          <input id="sizeScale" type="range" min="0.72" max="1.35" step="0.07" value="1.0" class="w-full accent-indigo-500 cursor-pointer" />
+          <div class="flex justify-between text-[10px] text-slate-500">
+            <span>Less Pages</span>
+            <span>Pen-Friendly</span>
+            <span>Extra Big</span>
+          </div>
+        </div>
+
+        <!-- Ink & Bold -->
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs text-slate-300 mb-1 font-medium">Ink Mode</label>
+            <label class="block text-xs text-slate-300 mb-1 font-medium">Print Ink</label>
             <select id="colorMode" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-white">
-              <option value="bw" selected>Jet-Black B&W (Sharp)</option>
-              <option value="color">Smart Color (Readable)</option>
+              <option value="bw" selected>Deep Jet-Black (Best)</option>
+              <option value="color">Smart Color</option>
             </select>
           </div>
           <div>
-            <label class="block text-xs text-slate-300 mb-1 font-medium">Ink Boldness</label>
+            <label class="block text-xs text-slate-300 mb-1 font-medium">Handwriting Thickness</label>
             <select id="boldLevel" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-white">
-              <option value="0">Normal</option>
+              <option value="0">Original</option>
               <option value="1" selected>Bold (Highlighter Safe)</option>
-              <option value="2">Extra Bold</option>
+              <option value="2">Extra Bold (Thin Pens)</option>
             </select>
           </div>
         </div>
 
-        <!-- Checkboxes -->
-        <div class="space-y-2.5 pt-1 text-xs text-slate-200">
+        <!-- Advanced Switches -->
+        <div class="space-y-2 text-xs text-slate-200">
           <label class="flex items-center justify-between bg-slate-950/70 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer">
-            <span>✂️ Auto-Crop & Split 2-Col Slides</span>
+            <span>🗜️ Internal Gap Squisher (Remove Inner Blank Bands)</span>
+            <input id="squishGaps" type="checkbox" checked class="accent-indigo-500 w-4 h-4" />
+          </label>
+          <label class="flex items-center justify-between bg-slate-950/70 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer">
+            <span>🔎 Protect Wide Handwriting (Auto Full-Width)</span>
+            <input id="protectHandwriting" type="checkbox" checked class="accent-indigo-500 w-4 h-4" />
+          </label>
+          <label class="flex items-center justify-between bg-slate-950/70 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer">
+            <span>✂️ Auto-Split 2-Column Slides + Wipe Corner Logo</span>
             <input id="autoSplit" type="checkbox" checked class="accent-indigo-500 w-4 h-4" />
           </label>
           <label class="flex items-center justify-between bg-slate-950/70 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer">
-            <span>🧹 Auto-Skip Duplicate / Blank Slides</span>
+            <span>🧹 Smart Skip Duplicates, Repeated PYQs & Blanks</span>
             <input id="skipDupes" type="checkbox" checked class="accent-indigo-500 w-4 h-4" />
           </label>
           <label class="flex items-center justify-between bg-slate-950/70 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer">
-            <span>🚫 Hide Top-Right Coaching Logo</span>
-            <input id="hideLogo" type="checkbox" checked class="accent-indigo-500 w-4 h-4" />
-          </label>
-          <label class="flex items-center justify-between bg-slate-950/70 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer">
-            <span>✍️ Add Side Pen-Margin (Cornell Notes)</span>
+            <span>✍️ Add Right Pen-Margin (Cornell Notes)</span>
             <input id="penMargin" type="checkbox" class="accent-indigo-500 w-4 h-4" />
           </label>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="grid grid-cols-2 gap-2.5 pt-2">
+        <!-- Primary Action Buttons -->
+        <div class="grid grid-cols-2 gap-2.5 pt-1">
           <button id="previewBtn" disabled
-            class="py-2.5 px-3 rounded-xl font-semibold text-sm bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-white transition">
-            👁️ Live Preview
+            class="py-2.5 px-3 rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-white transition">
+            👁️ Generate Preview
           </button>
           <button id="exportBtn" disabled
-            class="py-2.5 px-3 rounded-xl font-semibold text-sm bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white transition shadow-lg shadow-indigo-600/20">
+            class="py-2.5 px-3 rounded-xl font-bold text-sm bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white transition shadow-lg shadow-indigo-600/25">
             ⬇️ Download PDF
           </button>
         </div>
+
+        <!-- Slide Reviewer Button -->
+        <button id="manageSlidesBtn" disabled
+          class="hidden w-full py-2 px-3 rounded-xl font-semibold text-xs bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 transition">
+          🗂️ Remove Extra PYQs / Memes Manually (Cut Pages Even More!)
+        </button>
       </div>
 
-      <!-- Progress & Stats -->
-      <div id="statusCard" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+      <!-- Progress & Savings Card -->
+      <div id="statusCard" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-xl">
         <div class="flex justify-between items-center text-xs">
           <span id="statusText" class="font-medium text-indigo-300">Processing...</span>
           <span id="statusPct" class="font-bold text-white">0%</span>
         </div>
         <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
-          <div id="progressBar" class="bg-indigo-500 h-2.5 rounded-full transition-all duration-150" style="width: 0%"></div>
+          <div id="progressBar" class="bg-gradient-to-r from-indigo-500 to-emerald-400 h-2.5 rounded-full transition-all duration-150" style="width: 0%"></div>
         </div>
-        <div id="statsSummary" class="hidden grid grid-cols-3 gap-2 text-center pt-1">
-          <div class="bg-slate-950 rounded-lg p-2 border border-slate-800">
-            <div id="statInput" class="text-base font-bold text-white">0</div>
-            <div class="text-[10px] text-slate-400">Input Slides</div>
+        <div id="statsSummary" class="hidden space-y-2 pt-1">
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="bg-slate-950 rounded-lg p-2 border border-slate-800">
+              <div id="statInput" class="text-base font-extrabold text-white">0</div>
+              <div class="text-[10px] text-slate-400">Input Slides</div>
+            </div>
+            <div class="bg-slate-950 rounded-lg p-2 border border-slate-800">
+              <div id="statOutput" class="text-base font-extrabold text-emerald-400">0</div>
+              <div class="text-[10px] text-slate-400">A4 Pages</div>
+            </div>
+            <div class="bg-slate-950 rounded-lg p-2 border border-slate-800">
+              <div id="statMoney" class="text-base font-extrabold text-amber-400">₹0</div>
+              <div class="text-[10px] text-slate-400">Est. Print Saved</div>
+            </div>
           </div>
-          <div class="bg-slate-950 rounded-lg p-2 border border-slate-800">
-            <div id="statOutput" class="text-base font-bold text-emerald-400">0</div>
-            <div class="text-[10px] text-slate-400">A4 Pages</div>
-          </div>
-          <div class="bg-slate-950 rounded-lg p-2 border border-slate-800">
-            <div id="statSaved" class="text-base font-bold text-amber-400">0%</div>
-            <div class="text-[10px] text-slate-400">Paper Saved</div>
-          </div>
+          <p id="skippedInfo" class="text-[11px] text-slate-400 text-center"></p>
         </div>
-        <p id="skippedInfo" class="hidden text-[11px] text-slate-400 text-center"></p>
       </div>
     </section>
 
-    <!-- Right Preview Panel -->
-    <section class="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col min-h-[540px]">
+    <!-- Right Live Preview -->
+    <section class="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col min-h-[600px] shadow-xl">
       <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
         <div>
-          <h2 class="font-semibold text-sm text-white">Live Printable A4 Preview</h2>
-          <p class="text-xs text-slate-400">Jo yahan dikhega, bilkul wahi crisp print PDF mein niklega</p>
+          <h2 class="font-bold text-sm text-white">Live Printable A4 Preview</h2>
+          <p id="previewSubtitle" class="text-xs text-slate-400">Check exact font clarity before printing a single page</p>
         </div>
-        <div id="previewNav" class="hidden items-center gap-2">
-          <button id="prevPageBtn" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs">◀ Prev</button>
-          <span id="previewPageLabel" class="text-xs font-medium text-slate-300">Page 1 / 1</span>
-          <button id="nextPageBtn" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs">Next ▶</button>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- Zoom Toggle -->
+          <button id="zoomToggleBtn" class="hidden px-2.5 py-1 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/30 text-indigo-300 text-xs font-semibold transition">
+            🔍 100% Real Print Size
+          </button>
+
+          <!-- Page Nav -->
+          <div id="previewNav" class="hidden items-center gap-1.5">
+            <button id="prevPageBtn" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium">◀ Prev</button>
+            <span id="previewPageLabel" class="text-xs font-bold text-slate-200 px-1">Page 1 / 1</span>
+            <button id="nextPageBtn" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium">Next ▶</button>
+          </div>
         </div>
       </div>
 
-      <div id="previewArea" class="flex-1 flex items-center justify-center p-4 overflow-auto bg-slate-950/70 rounded-xl mt-3">
-        <div id="emptyState" class="text-center max-w-md space-y-2">
-          <div class="text-5xl">✨</div>
-          <h3 class="font-semibold text-slate-200">PDF Upload karo aur Magic dekho</h3>
+      <div id="previewScrollBox" class="flex-1 flex items-start justify-center p-4 overflow-auto bg-slate-950/80 rounded-xl mt-3">
+        <div id="emptyState" class="my-auto text-center max-w-md space-y-3 py-10">
+          <div class="text-5xl">📘</div>
+          <h3 class="font-bold text-base text-slate-200">Upload Your Coaching PDF to See the Difference</h3>
           <p class="text-xs text-slate-400 leading-relaxed">
-            Normal apps sirf slides ko chhota kar dete hain. NotePress har slide ki khali black space kaat kar, white cards ko bina kaala kiye, aur patle ink ko bold karke bade aksharon mein book jaisa pack karta hai.
+            Normal PDF apps blindly shrink 6 slides into tiny boxes and turn white cards into black ink traps.
+            <b>NotePress Pro v3</b> squishes inner blank space, protects wide handwriting at full width, removes duplicate slides, and prints crisp jet-black notes.
           </p>
+          <div class="grid grid-cols-3 gap-2 pt-2 text-[11px]">
+            <div class="bg-slate-900 border border-slate-800 rounded-lg p-2">
+              <div class="font-bold text-indigo-400">1. Upload</div>
+              <div class="text-slate-400">Any size PDF</div>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-lg p-2">
+              <div class="font-bold text-emerald-400">2. Auto-Clean</div>
+              <div class="text-slate-400">Crop + Squish</div>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-lg p-2">
+              <div class="font-bold text-amber-400">3. Print Book</div>
+              <div class="text-slate-400">Save ₹500+</div>
+            </div>
+          </div>
         </div>
-        <canvas id="a4PreviewCanvas" class="hidden a4-canvas max-w-full rounded"></canvas>
+        <canvas id="a4PreviewCanvas" class="hidden a4-canvas a4-fit rounded"></canvas>
       </div>
     </section>
 
   </main>
+
+  <!-- Trust, Features & FAQ Section -->
+  <section id="how-it-works" class="max-w-7xl w-full mx-auto px-4 py-10 border-t border-slate-800/80 space-y-8">
+    <div class="text-center max-w-2xl mx-auto">
+      <h2 class="text-xl sm:text-2xl font-extrabold text-white">Why Students Trust NotePress Pro Over Normal Apps</h2>
+      <p class="text-xs sm:text-sm text-slate-400 mt-1">Built specifically for Indian NEET, JEE, UPSC & SSC digital board notes</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-1.5">
+        <div class="text-2xl">🗜️</div>
+        <h3 class="font-bold text-sm text-white">Internal Gap Squisher</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">Removes empty white bands inside each slide without shrinking a single handwritten letter or diagram.</p>
+      </div>
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-1.5">
+        <div class="text-2xl">🔎</div>
+        <h3 class="font-bold text-sm text-white">Anti-Tiny Handwriting</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">Detects dense full-board handwritten solutions and gives them Full A4 Width automatically so you can read & highlight easily.</p>
+      </div>
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-1.5">
+        <div class="text-2xl">🛡️</div>
+        <h3 class="font-bold text-sm text-white">Anti-Blackbox Protection</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">Smart region scanning converts black/maroon boards to white while keeping embedded white textbook cards clean.</p>
+      </div>
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-1.5">
+        <div class="text-2xl">🔒</div>
+        <h3 class="font-bold text-sm text-white">100% Local Privacy</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">Your notes never leave your phone or PC. All PDF processing happens directly inside your browser — zero server storage.</p>
+      </div>
+    </div>
+
+    <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div>
+        <h3 class="font-bold text-sm text-white">💡 Pro Tip for 450+ Page One-Shot Chapters</h3>
+        <p class="text-xs text-slate-400 mt-1 max-w-2xl">
+          One-shot PDFs mein 150+ pages sirf practice PYQs ya memes hote hain. Scan ke baad <b>"Remove Extra PYQs / Memes Manually"</b> button kholo, jo easy questions ya memes print nahi karne unhe uncheck karo — poora chapter sirf <b>35–45 pages</b> mein ekdum textbook-size font mein aa jayega!
+        </p>
+      </div>
+      <span class="shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+        Print Cost: ~₹70 instead of ₹900
+      </span>
+    </div>
+  </section>
+
+  <footer class="border-t border-slate-800/80 py-5 text-center text-xs text-slate-500">
+    NotePress Pro v3 • Free Student Study Utility • Made in India 🇮🇳 • Runs 100% in Browser
+  </footer>
+
+  <!-- Slide Manager Modal -->
+  <div id="slidesModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+      <div class="p-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h3 class="font-bold text-base text-white">🗂️ Slide Manager — Uncheck Faltu Slides / Extra PYQs</h3>
+          <p id="modalCountLabel" class="text-xs text-slate-400">Selected slides will be packed instantly without rescanning</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button id="modalSelectAll" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-200">Select All Kept</button>
+          <button id="modalUncheckSmall" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-amber-300">Uncheck Low-Content Slides</button>
+          <button id="modalApplyBtn" class="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white">✅ Apply & Repack Now</button>
+          <button id="modalCloseBtn" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-rose-600/80 text-xs text-white">✕</button>
+        </div>
+      </div>
+      <div id="slidesGrid" class="p-4 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 bg-slate-950/70"></div>
+    </div>
+  </div>
 
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -193,70 +355,105 @@
     let uploadedFileName = 'Notes';
     let lastPackedPages = [];
     let currentPreviewIdx = 0;
+    let isActualZoom = false;
+
+    // Cache scanned pages for instant repacking & manual filtering
+    let cachedKey = '';
+    let cachedPages = []; // [{ pageNum, enabled, autoSkippedReason, inkRatio, blocks: [...] }]
+    let cachedInputCount = 0;
 
     const el = (id) => document.getElementById(id);
 
-    function setRange(val) {
-      el('pageRange').value = val;
+    function quickRange(a, b) {
+      const maxP = totalPdfPages || b;
+      el('fromPage').value = Math.min(a, maxP);
+      el('toPage').value = Math.min(b, maxP);
+      el('targetPages').value = Math.max(2, Math.round((Math.min(b, maxP) - Math.min(a, maxP) + 1) / 5));
     }
 
-    // Upload handler
+    el('btnAllPages').addEventListener('click', () => {
+      if (!totalPdfPages) return;
+      el('fromPage').value = 1;
+      el('toPage').value = totalPdfPages;
+      el('targetPages').value = Math.max(5, Math.round(totalPdfPages / 6));
+    });
+
+    el('layoutMode').addEventListener('change', () => {
+      const m = el('layoutMode').value;
+      el('targetBox').classList.toggle('hidden', m !== 'target');
+      el('sizeSliderBox').classList.toggle('hidden', m !== 'smart-book');
+      instantRepackIfReady();
+    });
+
+    el('sizeScale').addEventListener('input', () => {
+      const v = parseFloat(el('sizeScale').value);
+      el('sizeLabel').textContent = v < 0.88 ? 'Compact (Less Pages)' : (v > 1.12 ? 'Extra Large (Pen-Friendly)' : 'Balanced (Recommended)');
+      instantRepackIfReady();
+    });
+
+    ['targetPages', 'protectHandwriting', 'penMargin'].forEach(id => {
+      el(id).addEventListener('change', instantRepackIfReady);
+    });
+
+    el('zoomToggleBtn').addEventListener('click', () => {
+      isActualZoom = !isActualZoom;
+      const c = el('a4PreviewCanvas');
+      c.classList.toggle('a4-actual', isActualZoom);
+      c.classList.toggle('a4-fit', !isActualZoom);
+      el('zoomToggleBtn').textContent = isActualZoom ? '🖼️ Fit to Screen' : '🔍 100% Real Print Size';
+    });
+
     el('pdfInput').addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) return;
       uploadedFileName = file.name.replace(/\.pdf$/i, '');
       el('fileNameLabel').textContent = file.name;
-      el('fileMetaLabel').textContent = 'Loading PDF structure...';
+      el('fileMetaLabel').textContent = 'Reading PDF...';
+      cachedKey = '';
+      cachedPages = [];
+      el('instantBadge').classList.add('hidden');
+      el('manageSlidesBtn').classList.add('hidden');
       try {
         const buffer = await file.arrayBuffer();
         pdfDoc = await pdfjsLib.getDocument({ data: buffer }).promise;
         totalPdfPages = pdfDoc.numPages;
-        el('fileMetaLabel').textContent = `✅ ${totalPdfPages} Pages Ready (${(file.size / 1024 / 1024).toFixed(1)} MB)`;
+        el('fromPage').max = totalPdfPages;
+        el('toPage').max = totalPdfPages;
+        el('fromPage').value = 1;
+        el('toPage').value = totalPdfPages;
+        el('targetPages').value = Math.max(5, Math.round(totalPdfPages / 7));
+        el('fileMetaLabel').textContent = `✅ ${totalPdfPages} Slides Loaded (${(file.size / 1024 / 1024).toFixed(1)} MB)`;
         el('previewBtn').disabled = false;
         el('exportBtn').disabled = false;
-        if (totalPdfPages <= 25) el('pageRange').value = 'all';
       } catch (err) {
-        alert('PDF load karne mein error aaya: ' + err.message);
-        el('fileMetaLabel').textContent = '❌ Invalid or protected PDF';
+        alert('PDF open karne mein dikkat aayi: ' + err.message);
+        el('fileMetaLabel').textContent = '❌ Invalid or password-protected PDF';
       }
     });
 
-    function parsePageRange(str, maxPages) {
-      const clean = (str || 'all').trim().toLowerCase();
-      if (!clean || clean === 'all') {
-        return Array.from({ length: maxPages }, (_, i) => i + 1);
-      }
-      const set = new Set();
-      clean.split(',').forEach(part => {
-        const p = part.trim();
-        if (p.includes('-')) {
-          let [a, b] = p.split('-').map(n => parseInt(n.trim(), 10));
-          if (!isNaN(a) && !isNaN(b)) {
-            a = Math.max(1, Math.min(maxPages, a));
-            b = Math.max(1, Math.min(maxPages, b));
-            for (let i = Math.min(a, b); i <= Math.max(a, b); i++) set.add(i);
-          }
-        } else {
-          const n = parseInt(p, 10);
-          if (!isNaN(n) && n >= 1 && n <= maxPages) set.add(n);
-        }
-      });
-      return Array.from(set).sort((a, b) => a - b);
-    }
-
     function getOptions() {
+      const f = Math.max(1, Math.min(totalPdfPages || 1, parseInt(el('fromPage').value, 10) || 1));
+      const t = Math.max(f, Math.min(totalPdfPages || 1, parseInt(el('toPage').value, 10) || totalPdfPages || 1));
       return {
+        fromPage: f,
+        toPage: t,
         layout: el('layoutMode').value,
+        targetPages: Math.max(1, parseInt(el('targetPages').value, 10) || 40),
+        sizeScale: parseFloat(el('sizeScale').value) || 1.0,
         colorMode: el('colorMode').value,
         bold: parseInt(el('boldLevel').value, 10),
+        squishGaps: el('squishGaps').checked,
+        protectHandwriting: el('protectHandwriting').checked,
         autoSplit: el('autoSplit').checked,
         skipDupes: el('skipDupes').checked,
-        hideLogo: el('hideLogo').checked,
         penMargin: el('penMargin').checked
       };
     }
 
-    // Hue-preserving dark-to-light color mapping
+    function getScanCacheKey(opts) {
+      return [uploadedFileName, opts.fromPage, opts.toPage, opts.colorMode, opts.bold, opts.squishGaps, opts.autoSplit, opts.skipDupes].join('|');
+    }
+
     function rgbToHsl(r, g, b) {
       r /= 255; g /= 255; b /= 255;
       const max = Math.max(r, g, b), min = Math.min(r, g, b);
@@ -277,8 +474,7 @@
       if (s === 0) { r = g = b = l; }
       else {
         const hue2rgb = (p, q, t) => {
-          if (t < 0) t += 1;
-          if (t > 1) t -= 1;
+          if (t < 0) t += 1; if (t > 1) t -= 1;
           if (t < 1/6) return p + (q - p) * 6 * t;
           if (t < 1/2) return q;
           if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
@@ -293,14 +489,11 @@
       return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
     }
 
-    // Core Smart Engine: White-Card Safe Invert + Chalk Sharpener + Boldener
+    // V3 Image Engine: Full PW Logo Wipe + Anti-Blackbox + Deep Jet-Black Handwriting Booster
     function cleanSlidePixels(imgData, opts) {
       const w = imgData.width, h = imgData.height, d = imgData.data;
-
-      // 1. Coarse grid to detect embedded WHITE CARDS vs DARK BOARD
       const cell = Math.max(16, Math.round(w / 48));
-      const cols = Math.ceil(w / cell);
-      const rows = Math.ceil(h / cell);
+      const cols = Math.ceil(w / cell), rows = Math.ceil(h / cell);
       const grid = new Uint8Array(cols * rows);
 
       for (let gy = 0; gy < rows; gy++) {
@@ -311,8 +504,7 @@
           for (let y = y0; y < y1; y += 2) {
             for (let x = x0; x < x1; x += 2) {
               const i = (y * w + x) * 4;
-              const lum = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
-              if (lum > 185) bright++;
+              if (0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2] > 185) bright++;
               total++;
             }
           }
@@ -320,7 +512,7 @@
         }
       }
 
-      // Fill interior holes inside white cards (dense graphs/text inside white cards)
+      // Fill interior dark text blocks inside white cards
       const gridFilled = new Uint8Array(grid);
       for (let gy = 1; gy < rows - 1; gy++) {
         for (let gx = 1; gx < cols - 1; gx++) {
@@ -331,10 +523,9 @@
         }
       }
 
-      const logoX = Math.floor(w * 0.922);
-      const logoY = Math.floor(h * 0.132);
-
-      // 2. Clean pixels & build 64x36 fingerprint mask for duplicate detection
+      // Generous top-right logo wipe so zero circular curve remnants break auto-crop!
+      const logoX = Math.floor(w * 0.895);
+      const logoY = Math.floor(h * 0.165);
       const mW = 64, mH = 36;
       const mask = new Uint8Array(mW * mH);
       let inkPixels = 0;
@@ -345,65 +536,58 @@
         for (let x = 0; x < w; x++) {
           const i = (y * w + x) * 4;
 
-          if (opts.hideLogo && x >= logoX && y <= logoY) {
-            d[i] = d[i+1] = d[i+2] = 255;
-            d[i+3] = 255;
+          // Wipe corner logo + outer 4px black border edges
+          if ((opts.autoSplit && x >= logoX && y <= logoY) || x < 3 || y < 3 || x > w - 4 || y > h - 4) {
+            d[i] = d[i+1] = d[i+2] = d[i+3] = 255;
             continue;
           }
 
           const r = d[i], g = d[i+1], b = d[i+2];
           const lum = 0.299 * r + 0.587 * g + 0.114 * b;
-          const isLightRegion = gridFilled[gy + Math.floor(x / cell)] === 1;
-
+          const isLight = gridFilled[gy + Math.floor(x / cell)] === 1;
           let nr = 255, ng = 255, nb = 255;
 
-          if (isLightRegion) {
-            // Preserve white card: keep background white, sharpen dark/colored ink
-            if (lum > 218) {
+          if (isLight) {
+            if (lum > 215) {
               nr = ng = nb = 255;
             } else if (opts.colorMode === 'bw') {
               const minC = Math.min(r, g, b);
-              const val = Math.max(0, Math.min(255, Math.round((Math.min(lum, minC * 1.15) - 25) * 1.15)));
+              const val = Math.max(0, Math.min(255, Math.round((Math.min(lum, minC * 1.1) - 45) * 1.45)));
               nr = ng = nb = val;
             } else {
-              nr = Math.max(0, Math.round(r * 0.85));
-              ng = Math.max(0, Math.round(g * 0.85));
-              nb = Math.max(0, Math.round(b * 0.85));
+              nr = Math.round(r * 0.82); ng = Math.round(g * 0.82); nb = Math.round(b * 0.82);
             }
           } else {
-            // Dark board / Maroon slide: background -> pure white, chalk -> crisp dark ink
             const maxC = Math.max(r, g, b);
-            const isMaroonBg = (lum < 62 && (r - b) > 22 && g < 48);
-            if ((lum < 48 && maxC < 88) || isMaroonBg) {
+            const isMaroonBg = (lum < 64 && (r - b) > 20 && g < 50);
+            if ((lum < 46 && maxC < 84) || isMaroonBg) {
               nr = ng = nb = 255;
             } else if (opts.colorMode === 'bw') {
-              const strength = Math.max(lum, maxC * 0.92);
-              const val = Math.max(0, Math.min(255, Math.round(255 - (strength - 42) * 1.55)));
+              // Deep Jet-Black curve so thin colored stylus handwriting never prints faint grey!
+              const strength = Math.max(lum, maxC * 0.94);
+              const val = Math.max(0, Math.min(255, Math.round(255 - (strength - 38) * 2.45)));
               nr = ng = nb = val;
             } else {
               const [hh, ss, ll] = rgbToHsl(r, g, b);
-              const newL = Math.max(0.05, Math.min(0.42, (1 - ll) * 0.62));
-              const newS = ss < 0.15 ? 0 : Math.min(1, ss * 1.15);
-              [nr, ng, nb] = hslToRgb(hh, newS, newL);
+              [nr, ng, nb] = hslToRgb(hh, ss < 0.15 ? 0 : Math.min(1, ss * 1.2), Math.max(0.04, Math.min(0.38, (1 - ll) * 0.55)));
             }
           }
 
           d[i] = nr; d[i+1] = ng; d[i+2] = nb; d[i+3] = 255;
-          if (nr < 200 || ng < 200 || nb < 200) {
+          if (nr < 195 || ng < 195 || nb < 195) {
             inkPixels++;
             mask[my + Math.min(mW - 1, Math.floor((x * mW) / w))] = 1;
           }
         }
       }
 
-      // 3. Ink Boldener (thickens thin stylus writing for print & highlighters)
+      // Ink Boldener for thin stylus writing
       if (opts.bold > 0) {
         const src = new Uint8ClampedArray(d);
         for (let y = 1; y < h - 1; y++) {
           for (let x = 1; x < w - 1; x++) {
             const i = (y * w + x) * 4;
-            const iR = i + 4;
-            const iB = i + w * 4;
+            const iR = i + 4, iB = i + w * 4;
             if (opts.bold === 1) {
               d[i]   = Math.min(src[i],   src[iR],   src[iB]);
               d[i+1] = Math.min(src[i+1], src[iR+1], src[iB+1]);
@@ -420,86 +604,130 @@
 
       let maskCount = 0;
       for (let k = 0; k < mask.length; k++) maskCount += mask[k];
-      return { mask, maskCount, inkPixels };
+      return { mask, maskCount, inkPixels, inkRatio: inkPixels / (w * h) };
     }
 
-    // Tight bounding box inside a region
+    // Noise-resistant Tight Bounding Box (ignores stray 1-2px dust specks)
     function getTightBox(imgData, xStart, yStart, xEnd, yEnd) {
       const w = imgData.width, d = imgData.data;
       const rowInk = new Uint16Array(yEnd - yStart);
       const colInk = new Uint16Array(xEnd - xStart);
-
       for (let y = yStart; y < yEnd; y++) {
         let rc = 0;
         for (let x = xStart; x < xEnd; x++) {
           const i = (y * w + x) * 4;
-          if (d[i] < 225 || d[i+1] < 225 || d[i+2] < 225) {
-            rc++;
-            colInk[x - xStart]++;
-          }
+          if (d[i] < 215 || d[i+1] < 215 || d[i+2] < 215) { rc++; colInk[x - xStart]++; }
         }
         rowInk[y - yStart] = rc;
       }
-
       let minY = -1, maxY = -1, minX = -1, maxX = -1;
-      for (let y = 0; y < rowInk.length; y++) { if (rowInk[y] >= 2) { minY = y + yStart; break; } }
-      for (let y = rowInk.length - 1; y >= 0; y--) { if (rowInk[y] >= 2) { maxY = y + yStart; break; } }
-      for (let x = 0; x < colInk.length; x++) { if (colInk[x] >= 2) { minX = x + xStart; break; } }
-      for (let x = colInk.length - 1; x >= 0; x--) { if (colInk[x] >= 2) { maxX = x + xStart; break; } }
-
-      if (minX < 0 || maxX - minX < 18 || maxY - minY < 18) return null;
-
-      const pad = 12;
-      return {
-        x: Math.max(0, minX - pad),
-        y: Math.max(0, minY - pad),
-        w: Math.min(imgData.width, maxX + pad) - Math.max(0, minX - pad),
-        h: Math.min(imgData.height, maxY + pad) - Math.max(0, minY - pad)
-      };
+      for (let y = 0; y < rowInk.length; y++) { if (rowInk[y] >= 3) { minY = y + yStart; break; } }
+      for (let y = rowInk.length - 1; y >= 0; y--) { if (rowInk[y] >= 3) { maxY = y + yStart; break; } }
+      for (let x = 0; x < colInk.length; x++) { if (colInk[x] >= 3) { minX = x + xStart; break; } }
+      for (let x = colInk.length - 1; x >= 0; x--) { if (colInk[x] >= 3) { maxX = x + xStart; break; } }
+      if (minX < 0 || maxX - minX < 20 || maxY - minY < 20) return null;
+      const pad = 8;
+      const nx = Math.max(0, minX - pad), ny = Math.max(0, minY - pad);
+      return { x: nx, y: ny, w: Math.min(imgData.width, maxX + pad) - nx, h: Math.min(imgData.height, maxY + pad) - ny };
     }
 
-    // Detect clean vertical gutter in wide 2-column coaching slides
+    // Split wide 2-column coaching slides down the clean middle gutter
     function splitIfTwoColumn(imgData, box, autoSplit) {
-      if (!autoSplit || (box.w / box.h) < 1.38 || box.w < 420) return [box];
+      if (!autoSplit || (box.w / box.h) < 1.32 || box.w < 380) return [box];
       const w = imgData.width, d = imgData.data;
-      const searchStart = box.x + Math.floor(box.w * 0.36);
-      const searchEnd = box.x + Math.floor(box.w * 0.64);
+      const sStart = box.x + Math.floor(box.w * 0.35);
+      const sEnd = box.x + Math.floor(box.w * 0.65);
       const colDensity = [];
-
-      for (let x = searchStart; x < searchEnd; x++) {
+      for (let x = sStart; x < sEnd; x++) {
         let dark = 0;
         for (let y = box.y; y < box.y + box.h; y += 2) {
           const i = (y * w + x) * 4;
-          if (d[i] < 220 || d[i+1] < 220 || d[i+2] < 220) dark++;
+          if (d[i] < 215 || d[i+1] < 215 || d[i+2] < 215) dark++;
         }
         colDensity.push(dark / (box.h / 2));
       }
-
-      // Find cleanest 18px vertical strip (even works across dotted divider lines)
-      const win = 18;
+      const win = 16;
       let bestScore = 999, bestIdx = -1;
       for (let i = 0; i <= colDensity.length - win; i++) {
         let sum = 0;
         for (let k = 0; k < win; k++) sum += colDensity[i + k];
-        const avg = sum / win;
-        if (avg < bestScore) { bestScore = avg; bestIdx = i; }
+        if ((sum / win) < bestScore) { bestScore = sum / win; bestIdx = i; }
       }
-
-      if (bestScore < 0.012 && bestIdx >= 0) {
-        const splitX = searchStart + bestIdx + Math.floor(win / 2);
+      if (bestScore < 0.015 && bestIdx >= 0) {
+        const splitX = sStart + bestIdx + Math.floor(win / 2);
         const left = getTightBox(imgData, box.x, box.y, splitX - 4, box.y + box.h);
         const right = getTightBox(imgData, splitX + 4, box.y, box.x + box.w, box.y + box.h);
-        if (left && right && left.w > 110 && right.w > 110) {
-          return [left, right];
-        }
+        if (left && right && left.w > 95 && right.w > 95) return [left, right];
       }
       return [box];
     }
 
-    // Progressive duplicate check (e.g., Question slide -> Question + Solution slide)
+    // NEW V3 KILLER FEATURE: Internal Blank Gap Squisher
+    // Collapses empty horizontal white bands INSIDE a slide without shrinking any letters!
+    function buildSquishedBlockCanvas(srcCanvas, imgData, box, squishGaps) {
+      if (!squishGaps) {
+        const c = document.createElement('canvas');
+        c.width = box.w; c.height = box.h;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, box.w, box.h);
+        ctx.drawImage(srcCanvas, box.x, box.y, box.w, box.h, 0, 0, box.w, box.h);
+        return c;
+      }
+
+      const w = imgData.width, d = imgData.data;
+      const isBlankRow = new Uint8Array(box.h);
+      for (let ry = 0; ry < box.h; ry++) {
+        const y = box.y + ry;
+        let dark = 0;
+        for (let x = box.x; x < box.x + box.w; x++) {
+          const i = (y * w + x) * 4;
+          if (d[i] < 215 || d[i+1] < 215 || d[i+2] < 215) {
+            dark++;
+            if (dark > 2) break;
+          }
+        }
+        if (dark <= 2) isBlankRow[ry] = 1;
+      }
+
+      // Build copy-strips keeping normal line spacing, collapsing large blank bands (>16px -> 8px)
+      const strips = [];
+      let ry = 0, outH = 0;
+      const MAX_BLANK = 16, KEEP_BLANK = 8;
+
+      while (ry < box.h) {
+        if (isBlankRow[ry] === 1) {
+          let end = ry;
+          while (end < box.h && isBlankRow[end] === 1) end++;
+          const len = end - ry;
+          const keep = len > MAX_BLANK ? KEEP_BLANK : len;
+          strips.push({ sy: box.y + ry, sh: keep, dy: outH });
+          outH += keep;
+          ry = end;
+        } else {
+          let end = ry;
+          while (end < box.h && isBlankRow[end] === 0) end++;
+          const len = end - ry;
+          strips.push({ sy: box.y + ry, sh: len, dy: outH });
+          outH += len;
+          ry = end;
+        }
+      }
+
+      const c = document.createElement('canvas');
+      c.width = box.w;
+      c.height = Math.max(20, outH);
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, c.width, c.height);
+      for (const s of strips) {
+        ctx.drawImage(srcCanvas, box.x, s.sy, box.w, s.sh, 0, s.dy, box.w, s.sh);
+      }
+      return c;
+    }
+
+    // Progressive duplicate check (e.g. Empty Q -> Q + Solution)
     function isProgressiveDuplicate(prev, curr) {
-      if (!prev || !curr || prev.maskCount < 10) return false;
-      if (curr.maskCount < prev.maskCount * 0.98) return false;
+      if (!prev || !curr || prev.maskCount < 10 || curr.maskCount < prev.maskCount * 0.96) return false;
       const mW = 64, mH = 36;
       let overlap = 0;
       for (let y = 0; y < mH; y++) {
@@ -509,19 +737,33 @@
             for (let dy = -1; dy <= 1 && !found; dy++) {
               for (let dx = -1; dx <= 1 && !found; dx++) {
                 const ny = y + dy, nx = x + dx;
-                if (ny >= 0 && ny < mH && nx >= 0 && nx < mW && curr.mask[ny * mW + nx] === 1) {
-                  found = true;
-                }
+                if (ny >= 0 && ny < mH && nx >= 0 && nx < mW && curr.mask[ny * mW + nx] === 1) found = true;
               }
             }
             if (found) overlap++;
           }
         }
       }
-      return (overlap / prev.maskCount) >= 0.82;
+      return (overlap / prev.maskCount) >= 0.80;
     }
 
-    // Render & process one PDF page
+    // Near-identical repeated slide check across recent slides (catches repeated PYQs!)
+    function isRepeatedSlide(curr, recentList) {
+      if (!curr || curr.maskCount < 15) return false;
+      for (const prev of recentList) {
+        if (Math.abs(prev.maskCount - curr.maskCount) > Math.max(prev.maskCount, curr.maskCount) * 0.25) continue;
+        let both = 0, union = 0;
+        for (let k = 0; k < curr.mask.length; k++) {
+          if (prev.mask[k] || curr.mask[k]) {
+            union++;
+            if (prev.mask[k] && curr.mask[k]) both++;
+          }
+        }
+        if (union > 0 && (both / union) >= 0.80) return true;
+      }
+      return false;
+    }
+
     async function processSinglePage(pageNum, opts, scale) {
       const page = await pdfDoc.getPage(pageNum);
       const viewport = page.getViewport({ scale });
@@ -538,277 +780,333 @@
       ctx.putImageData(imgData, 0, 0);
 
       const mainBox = getTightBox(imgData, 0, 0, canvas.width, canvas.height);
-      const isBlank = !mainBox || meta.inkPixels < (canvas.width * canvas.height * 0.0018);
+      const isBlank = !mainBox || meta.inkPixels < (canvas.width * canvas.height * 0.0022);
 
       const blocks = [];
       if (!isBlank) {
         const subBoxes = splitIfTwoColumn(imgData, mainBox, opts.autoSplit);
         for (const b of subBoxes) {
-          const c2 = document.createElement('canvas');
-          c2.width = b.w;
-          c2.height = b.h;
-          const ctx2 = c2.getContext('2d');
-          ctx2.fillStyle = '#ffffff';
-          ctx2.fillRect(0, 0, b.w, b.h);
-          ctx2.drawImage(canvas, b.x, b.y, b.w, b.h, 0, 0, b.w, b.h);
+          const c2 = buildSquishedBlockCanvas(canvas, imgData, b, opts.squishGaps);
+          const widthRatio = b.w / canvas.width;
+          // Wide dense board that would look tiny if squeezed into a narrow half-column
+          const needsFullWidth = (widthRatio > 0.68 && (c2.width / c2.height) > 1.28);
           blocks.push({
-            dataUrl: c2.toDataURL('image/jpeg', 0.85),
-            w: b.w,
-            h: b.h,
+            dataUrl: c2.toDataURL('image/jpeg', 0.80),
+            w: c2.width,
+            h: c2.height,
             origW: canvas.width,
             origH: canvas.height,
+            needsFullWidth,
             pageNum
           });
           c2.width = 0; c2.height = 0;
         }
       }
-
       canvas.width = 0; canvas.height = 0;
-      return { pageNum, isBlank, mask: meta.mask, maskCount: meta.maskCount, blocks };
+      return { pageNum, isBlank, mask: meta.mask, maskCount: meta.maskCount, inkRatio: meta.inkRatio, blocks };
     }
 
-    // Smart A4 Layout Packer (returns exact mm positions for both Preview & jsPDF)
-    function packBlocksToA4(blocks, opts) {
-      const pageW = 210, pageH = 297;
-      const mL = 7, mT = 7, mB = 11;
-      const mR = opts.penMargin ? 45 : 7;
-      const availW = pageW - mL - mR;
-      const availH = pageH - mT - mB;
-      const pages = [];
-
-      if (opts.layout === 'grid-4' || opts.layout === 'grid-6') {
-        const cols = 2, rows = opts.layout === 'grid-4' ? 2 : 3;
-        const perPage = cols * rows;
-        const gap = 4;
-        const cellW = (availW - gap * (cols - 1)) / cols;
-        const cellH = (availH - gap * (rows - 1)) / rows;
-
-        for (let i = 0; i < blocks.length; i += perPage) {
-          const items = [];
-          for (let j = 0; j < perPage && (i + j) < blocks.length; j++) {
-            const b = blocks[i + j];
-            const r = Math.floor(j / cols), c = j % cols;
-            const scale = Math.min(cellW / b.w, cellH / b.h);
-            const dw = b.w * scale, dh = b.h * scale;
-            items.push({
-              block: b,
-              x: mL + c * (cellW + gap) + (cellW - dw) / 2,
-              y: mT + r * (cellH + gap) + (cellH - dh) / 2,
-              w: dw, h: dh
-            });
-          }
-          pages.push({ items });
-        }
-        return pages;
-      }
-
-      if (opts.layout === 'flow-1') {
-        // Book Flow: Extra large pen-friendly font with smart pairing for small blocks
-        let curPage = { items: [] };
-        let curY = mT, rowX = mL, rowH = 0;
-        const gapX = 4, gapY = 4;
-
-        for (const b of blocks) {
-          const isWide = (b.w / b.origW) > 0.56;
-          const maxMmPerPx = (availW / b.origW) * 1.48;
-          let targetW = isWide ? availW : Math.min(availW, Math.max((availW - gapX) / 2, b.w * maxMmPerPx));
-          let scale = Math.min(targetW / b.w, maxMmPerPx);
-          let dw = b.w * scale, dh = b.h * scale;
-
-          if (dh > availH) {
-            const s = availH / dh;
-            dw *= s; dh *= s;
-          }
-
-          // Check if fits on current shelf
-          if (rowX > mL && (rowX + dw > mL + availW + 0.5)) {
-            curY += rowH + gapY;
-            rowX = mL;
-            rowH = 0;
-          }
-          if (curY + dh > pageH - mB) {
-            if (curPage.items.length > 0) pages.push(curPage);
-            curPage = { items: [] };
-            curY = mT; rowX = mL; rowH = 0;
-          }
-
-          curPage.items.push({ block: b, x: rowX, y: curY, w: dw, h: dh });
-          rowX += dw + gapX;
-          rowH = Math.max(rowH, dh);
-        }
-        if (curPage.items.length > 0) pages.push(curPage);
-        return pages;
-      }
-
-      // Default: 'flow-2' — 2-Column Tetris Masonry (Max Saving + Huge Readability)
-      const gapX = 4, gapY = 3.8;
+    // V3 SMART ADAPTIVE PACKER:
+    // Gives wide handwritten boards Full Width while packing graphs & half-slides side-by-side in 2 columns!
+    function packSmartAdaptive(blocks, availW, availH, mL, mT, sizeMult, protectHandwriting) {
+      const gapX = 3.5, gapY = 3.2;
       const colW = (availW - gapX) / 2;
-      let curPage = { items: [] };
+      const pages = [];
+      let curPage = { items: [], hasCols: true };
       let colY = [mT, mT];
 
       for (const b of blocks) {
-        const maxMmPerPx = colW / (b.origW * 0.44);
-        const scale = Math.min(colW / b.w, maxMmPerPx);
-        let dw = b.w * scale, dh = b.h * scale;
-        if (dh > availH) {
-          const s = availH / dh;
-          dw *= s; dh *= s;
-        }
+        const useFull = protectHandwriting && b.needsFullWidth;
 
-        let ci = colY[0] <= colY[1] ? 0 : 1;
-        if (colY[ci] + dh > pageH - mB) {
-          const alt = 1 - ci;
-          if (colY[alt] + dh <= pageH - mB) {
-            ci = alt;
-          } else {
+        if (useFull) {
+          // Wide handwritten slide -> Full A4 Width so handwriting stays HUGE & readable!
+          const maxMmPerPx = (availW / b.origW) * (1.08 * sizeMult);
+          let dw = Math.min(availW, b.w * maxMmPerPx);
+          let dh = dw * (b.h / b.w);
+          if (dh > availH) { const s = availH / dh; dw *= s; dh *= s; }
+
+          let startY = Math.max(colY[0], colY[1]);
+          if (startY + dh > mT + availH) {
             if (curPage.items.length > 0) pages.push(curPage);
-            curPage = { items: [] };
+            curPage = { items: [], hasCols: true };
             colY = [mT, mT];
+            startY = mT;
+          }
+
+          const x = mL + (availW - dw) / 2;
+          curPage.items.push({ block: b, x, y: startY, w: dw, h: dh, full: true });
+          const nextY = startY + dh + gapY;
+          colY = [nextY, nextY];
+        } else {
+          // Compact / split slide -> 2-column Tetris packing
+          const maxMmPerPx = (colW / (b.origW * 0.48)) * sizeMult;
+          let dw = Math.min(colW, b.w * maxMmPerPx);
+          let dh = dw * (b.h / b.w);
+          if (dh > availH) { const s = availH / dh; dw *= s; dh *= s; }
+
+          let ci = colY[0] <= colY[1] ? 0 : 1;
+          if (colY[ci] + dh > mT + availH) {
+            const alt = 1 - ci;
+            if (colY[alt] + dh <= mT + availH) {
+              ci = alt;
+            } else {
+              if (curPage.items.length > 0) pages.push(curPage);
+              curPage = { items: [], hasCols: true };
+              colY = [mT, mT];
+              ci = 0;
+            }
+          }
+
+          const x = mL + ci * (colW + gapX) + (colW - dw) / 2;
+          curPage.items.push({ block: b, x, y: colY[ci], w: dw, h: dh, full: false });
+          colY[ci] += dh + gapY;
+        }
+      }
+      if (curPage.items.length > 0) pages.push(curPage);
+      return pages;
+    }
+
+    function packMasonryCols(blocks, availW, availH, mL, mT, numCols, scaleMult) {
+      const gapX = numCols === 1 ? 0 : (numCols === 2 ? 3.5 : 2.6);
+      const gapY = numCols >= 3 ? 2.4 : 3.2;
+      const colW = (availW - gapX * (numCols - 1)) / numCols;
+      const pages = [];
+      let curPage = { items: [], hasCols: numCols > 1, numCols };
+      let colY = new Array(numCols).fill(mT);
+
+      for (const b of blocks) {
+        const baseMmPerPx = colW / b.origW;
+        let dw = Math.min(colW, b.w * baseMmPerPx * scaleMult);
+        let dh = dw * (b.h / b.w);
+        if (dh > availH) { const s = availH / dh; dw *= s; dh *= s; }
+
+        let ci = 0;
+        for (let c = 1; c < numCols; c++) { if (colY[c] < colY[ci]) ci = c; }
+        if (colY[ci] + dh > mT + availH) {
+          let found = -1;
+          for (let c = 0; c < numCols; c++) { if (colY[c] + dh <= mT + availH) { found = c; break; } }
+          if (found >= 0) ci = found;
+          else {
+            if (curPage.items.length > 0) pages.push(curPage);
+            curPage = { items: [], hasCols: numCols > 1, numCols };
+            colY = new Array(numCols).fill(mT);
             ci = 0;
           }
         }
-
         const x = mL + ci * (colW + gapX) + (colW - dw) / 2;
-        curPage.items.push({ block: b, x, y: colY[ci], w: dw, h: dh });
+        curPage.items.push({ block: b, x, y: colY[ci], w: dw, h: dh, full: numCols === 1 });
         colY[ci] += dh + gapY;
       }
       if (curPage.items.length > 0) pages.push(curPage);
       return pages;
     }
 
-    // Run full pipeline
+    function packToTarget(blocks, targetPages, availW, availH, mL, mT, protectHandwriting) {
+      if (!blocks.length) return [];
+      // First try smart adaptive (best readability!)
+      const minSmart = packSmartAdaptive(blocks, availW, availH, mL, mT, 0.55, protectHandwriting);
+      if (minSmart.length <= targetPages) {
+        let lo = 0.55, hi = 1.65, best = minSmart;
+        for (let i = 0; i < 12; i++) {
+          const mid = (lo + hi) / 2;
+          const res = packSmartAdaptive(blocks, availW, availH, mL, mT, mid, protectHandwriting);
+          if (res.length <= targetPages) { best = res; lo = mid; } else { hi = mid; }
+        }
+        return best;
+      }
+
+      // If target is very tight, try 2, 3, 4 column masonry
+      for (const cols of [2, 3, 4]) {
+        const minRes = packMasonryCols(blocks, availW, availH, mL, mT, cols, 0.5);
+        if (minRes.length <= targetPages) {
+          let lo = 0.5, hi = 2.4, best = minRes;
+          for (let i = 0; i < 12; i++) {
+            const mid = (lo + hi) / 2;
+            const res = packMasonryCols(blocks, availW, availH, mL, mT, cols, mid);
+            if (res.length <= targetPages) { best = res; lo = mid; } else { hi = mid; }
+          }
+          return best;
+        }
+      }
+      return packMasonryCols(blocks, availW, availH, mL, mT, 4, 0.45);
+    }
+
+    function getActiveBlocks() {
+      const blocks = [];
+      for (const p of cachedPages) {
+        if (p.enabled) blocks.push(...p.blocks);
+      }
+      return blocks;
+    }
+
+    function packBlocksToA4(blocks, opts) {
+      const pageW = 210, pageH = 297;
+      const mL = 6, mT = 6, mB = 10;
+      const mR = opts.penMargin ? 45 : 6;
+      const availW = pageW - mL - mR;
+      const availH = pageH - mT - mB;
+
+      if (opts.layout === 'target') {
+        return packToTarget(blocks, opts.targetPages, availW, availH, mL, mT, opts.protectHandwriting);
+      }
+      if (opts.layout === 'flow-1') {
+        return packMasonryCols(blocks, availW, availH, mL, mT, 1, 1.35);
+      }
+      if (opts.layout === 'flow-2') {
+        return packMasonryCols(blocks, availW, availH, mL, mT, 2, 1.9);
+      }
+      return packSmartAdaptive(blocks, availW, availH, mL, mT, opts.sizeScale, opts.protectHandwriting);
+    }
+
+    async function instantRepackIfReady() {
+      if (!pdfDoc || !cachedPages.length) return;
+      const opts = getOptions();
+      if (getScanCacheKey(opts) !== cachedKey) return;
+      const activeBlocks = getActiveBlocks();
+      const packed = packBlocksToA4(activeBlocks, opts);
+      lastPackedPages = packed;
+      await updateStatsAndPreview(packed, opts);
+    }
+
+    async function updateStatsAndPreview(packedPages, opts) {
+      const activeSlides = cachedPages.filter(p => p.enabled).length;
+      const skippedSlides = cachedInputCount - activeSlides;
+      const savedPages = Math.max(0, cachedInputCount - packedPages.length);
+      const savedPct = cachedInputCount > 0 ? Math.max(0, Math.round((savedPages / cachedInputCount) * 100)) : 0;
+      const moneySaved = savedPages * 2; // ₹2 per A4 B&W printout in India
+
+      el('statInput').textContent = cachedInputCount;
+      el('statOutput').textContent = packedPages.length;
+      el('statMoney').textContent = '₹' + moneySaved;
+      el('statsSummary').classList.remove('hidden');
+      el('skippedInfo').textContent = `${savedPct}% Paper Saved • ${activeSlides} slides kept, ${skippedSlides} blank/duplicate/unchecked skipped.`;
+
+      if (packedPages.length > 0) {
+        el('previewSubtitle').textContent = `${cachedInputCount} slides → ${packedPages.length} Crisp A4 Pages (Saved ₹${moneySaved} in print cost!)`;
+        currentPreviewIdx = Math.min(currentPreviewIdx, packedPages.length - 1);
+        await renderA4Preview(currentPreviewIdx, opts);
+      }
+    }
+
     async function runPipeline(isExport) {
       if (!pdfDoc) return;
       const opts = getOptions();
-      const pageNums = parsePageRange(el('pageRange').value, totalPdfPages);
-      if (pageNums.length === 0) {
-        alert('Sahi page range daalo (e.g. 1-20 ya all)');
-        return;
-      }
+      const key = getScanCacheKey(opts);
+      const totalSelected = opts.toPage - opts.fromPage + 1;
 
       el('previewBtn').disabled = true;
       el('exportBtn').disabled = true;
       el('statusCard').classList.remove('hidden');
-      el('statsSummary').classList.add('hidden');
-      el('skippedInfo').classList.add('hidden');
 
-      const renderScale = isExport ? 1.85 : 1.45;
-      const allBlocks = [];
-      let pending = null;
-      let skippedBlank = 0, skippedDupe = 0;
+      if (key !== cachedKey) {
+        el('statsSummary').classList.add('hidden');
+        const renderScale = totalSelected > 220 ? 1.38 : (totalSelected > 80 ? 1.55 : 1.75);
+        const scanned = [];
+        const recentKept = [];
+        let pending = null;
 
-      for (let idx = 0; idx < pageNums.length; idx++) {
-        const pNum = pageNums[idx];
-        const pct = Math.round(((idx + 1) / pageNums.length) * 100);
-        el('statusText').textContent = `Cleaning & Cropping Slide ${pNum} (${idx + 1}/${pageNums.length})...`;
-        el('statusPct').textContent = pct + '%';
-        el('progressBar').style.width = pct + '%';
+        for (let pNum = opts.fromPage, idx = 0; pNum <= opts.toPage; pNum++, idx++) {
+          const pct = Math.round(((idx + 1) / totalSelected) * 100);
+          el('statusText').textContent = `Squishing & Cleaning Slide ${pNum} (${idx + 1}/${totalSelected})...`;
+          el('statusPct').textContent = pct + '%';
+          el('progressBar').style.width = pct + '%';
 
-        const curr = await processSinglePage(pNum, opts, renderScale);
+          const curr = await processSinglePage(pNum, opts, renderScale);
 
-        if (opts.skipDupes && curr.isBlank) {
-          skippedBlank++;
-          continue;
+          if (curr.isBlank) {
+            scanned.push({ pageNum: pNum, enabled: false, reason: 'Blank', inkRatio: curr.inkRatio, blocks: [] });
+            continue;
+          }
+
+          if (opts.skipDupes && isRepeatedSlide(curr, recentKept)) {
+            scanned.push({ pageNum: pNum, enabled: false, reason: 'Repeated PYQ/Slide', inkRatio: curr.inkRatio, blocks: curr.blocks });
+            continue;
+          }
+
+          if (pending) {
+            if (opts.skipDupes && isProgressiveDuplicate(pending, curr)) {
+              scanned.push({ pageNum: pending.pageNum, enabled: false, reason: 'Half Slide (Skipped)', inkRatio: pending.inkRatio, blocks: pending.blocks });
+              pending = curr;
+            } else {
+              scanned.push({ pageNum: pending.pageNum, enabled: true, reason: '', inkRatio: pending.inkRatio, blocks: pending.blocks });
+              recentKept.push({ mask: pending.mask, maskCount: pending.maskCount });
+              if (recentKept.length > 20) recentKept.shift();
+              pending = curr;
+            }
+          } else {
+            pending = curr;
+          }
+
+          await new Promise(r => setTimeout(r, 0));
         }
 
         if (pending) {
-          if (opts.skipDupes && isProgressiveDuplicate(pending, curr)) {
-            skippedDupe++;
-            pending = curr;
-          } else {
-            allBlocks.push(...pending.blocks);
-            pending = curr;
-          }
-        } else {
-          pending = curr;
+          scanned.push({ pageNum: pending.pageNum, enabled: true, reason: '', inkRatio: pending.inkRatio, blocks: pending.blocks });
         }
 
-        await new Promise(r => setTimeout(r, 0)); // keep UI smooth
+        // Release masks from memory
+        cachedPages = scanned;
+        cachedKey = key;
+        cachedInputCount = totalSelected;
+        el('instantBadge').classList.remove('hidden');
+        el('manageSlidesBtn').classList.remove('hidden');
+        el('manageSlidesBtn').disabled = false;
       }
-      if (pending) allBlocks.push(...pending.blocks);
 
-      el('statusText').textContent = 'Packing notes into A4 book pages...';
+      el('statusText').textContent = 'Packing with Anti-Tiny Handwriting Layout...';
+      el('statusPct').textContent = '100%';
+      el('progressBar').style.width = '100%';
       await new Promise(r => setTimeout(r, 15));
 
-      const packedPages = packBlocksToA4(allBlocks, opts);
+      const activeBlocks = getActiveBlocks();
+      const packedPages = packBlocksToA4(activeBlocks, opts);
       lastPackedPages = packedPages;
-      const savedPct = pageNums.length > 0 ? Math.max(0, Math.round((1 - packedPages.length / pageNums.length) * 100)) : 0;
-
-      el('statInput').textContent = pageNums.length;
-      el('statOutput').textContent = packedPages.length;
-      el('statSaved').textContent = savedPct + '%';
-      el('statsSummary').classList.remove('hidden');
-
-      if (skippedBlank + skippedDupe > 0) {
-        el('skippedInfo').textContent = `Auto-skipped ${skippedDupe} duplicate/half slides & ${skippedBlank} blank slides.`;
-        el('skippedInfo').classList.remove('hidden');
-      }
-
-      if (packedPages.length > 0) {
-        currentPreviewIdx = 0;
-        await renderA4Preview(0, opts, savedPct);
-      }
+      currentPreviewIdx = 0;
+      await updateStatsAndPreview(packedPages, opts);
 
       if (isExport && packedPages.length > 0) {
-        el('statusText').textContent = 'Building final HD Printable PDF...';
+        el('statusText').textContent = 'Exporting HD Printable PDF...';
         await new Promise(r => setTimeout(r, 20));
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
+        const savedPct = cachedInputCount > 0 ? Math.max(0, Math.round((1 - packedPages.length / cachedInputCount) * 100)) : 0;
 
         for (let p = 0; p < packedPages.length; p++) {
           if (p > 0) doc.addPage();
           const pg = packedPages[p];
 
-          // Optional Cornell Pen-Margin
           if (opts.penMargin) {
-            doc.setDrawColor(195, 195, 195);
-            doc.setLineWidth(0.3);
-            doc.line(167, 7, 167, 286);
-            doc.setFontSize(7.5);
-            doc.setTextColor(120, 120, 120);
-            doc.text('MY NOTES / TRICKS', 170, 11);
-            doc.setDrawColor(232, 232, 232);
-            doc.setLineWidth(0.15);
-            for (let ly = 18; ly < 284; ly += 8) doc.line(169, ly, 204, ly);
-          }
-
-          // Center column divider for 2-column mode
-          if (opts.layout === 'flow-2') {
-            const availW = 210 - 7 - (opts.penMargin ? 45 : 7);
-            const midX = 7 + availW / 2;
-            doc.setDrawColor(225, 225, 225);
-            doc.setLineWidth(0.2);
-            doc.line(midX, 7, midX, 286);
+            doc.setDrawColor(195, 195, 195); doc.setLineWidth(0.3);
+            doc.line(167, 6, 167, 287);
+            doc.setFontSize(7.5); doc.setTextColor(120, 120, 120);
+            doc.text('MY NOTES / TRICKS', 170, 10);
+            doc.setDrawColor(232, 232, 232); doc.setLineWidth(0.15);
+            for (let ly = 17; ly < 285; ly += 8) doc.line(169, ly, 204, ly);
           }
 
           for (const item of pg.items) {
             doc.addImage(item.block.dataUrl, 'JPEG', item.x, item.y, item.w, item.h, undefined, 'FAST');
-            doc.setDrawColor(230, 230, 230);
-            doc.setLineWidth(0.15);
+            doc.setDrawColor(232, 232, 232); doc.setLineWidth(0.15);
             doc.rect(item.x, item.y, item.w, item.h);
-            doc.setFontSize(6);
-            doc.setTextColor(150, 150, 150);
-            doc.text(`#${item.block.pageNum}`, item.x + 1, item.y + 2.6);
+            doc.setFontSize(5.8); doc.setTextColor(150, 150, 150);
+            doc.text(`#${item.block.pageNum}`, item.x + 0.8, item.y + 2.4);
           }
 
-          // Footer
-          doc.setFontSize(7);
-          doc.setTextColor(135, 135, 135);
-          doc.text(`Page ${p + 1} of ${packedPages.length}   •   Made with NotePress Pro (Saved ${savedPct}% Pages)`, 7, 293);
+          doc.setFontSize(6.8); doc.setTextColor(135, 135, 135);
+          doc.text(`Page ${p + 1} of ${packedPages.length}   •   NotePress Pro (Saved ${savedPct}% Paper)`, 6, 293.5);
         }
 
-        doc.save(`${uploadedFileName}_Printable_${packedPages.length}pages.pdf`);
-        el('statusText').textContent = `✅ Done! ${pageNums.length} slides → ${packedPages.length} A4 Pages downloaded!`;
+        doc.save(`${uploadedFileName}_NotePress_${packedPages.length}pages.pdf`);
+        el('statusText').textContent = `✅ Downloaded! ${cachedInputCount} slides → ${packedPages.length} Crisp A4 Pages`;
       } else {
-        el('statusText').textContent = `✅ Preview Ready! (${pageNums.length} slides → ${packedPages.length} A4 pages)`;
+        el('statusText').textContent = `✅ Ready! Slider hilao ya "Remove Extra PYQs" kholo — turant update hoga.`;
       }
 
       el('previewBtn').disabled = false;
       el('exportBtn').disabled = false;
     }
 
-    // Draw A4 page on Live Preview Canvas
-    async function renderA4Preview(idx, opts, savedPct = 0) {
+    async function renderA4Preview(idx, opts) {
       const pg = lastPackedPages[idx];
       if (!pg) return;
       el('emptyState').classList.add('hidden');
@@ -816,9 +1114,10 @@
       canvas.classList.remove('hidden');
       el('previewNav').classList.remove('hidden');
       el('previewNav').classList.add('flex');
+      el('zoomToggleBtn').classList.remove('hidden');
       el('previewPageLabel').textContent = `Page ${idx + 1} / ${lastPackedPages.length}`;
 
-      const pxPerMm = 3.5;
+      const pxPerMm = 3.8;
       canvas.width = Math.round(210 * pxPerMm);
       canvas.height = Math.round(297 * pxPerMm);
       const ctx = canvas.getContext('2d');
@@ -826,33 +1125,14 @@
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       if (opts.penMargin) {
-        ctx.strokeStyle = '#cbd5e1';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(167 * pxPerMm, 7 * pxPerMm);
-        ctx.lineTo(167 * pxPerMm, 286 * pxPerMm);
-        ctx.stroke();
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = 'bold 10px sans-serif';
-        ctx.fillText('MY NOTES / TRICKS', 170 * pxPerMm, 11 * pxPerMm);
+        ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(167 * pxPerMm, 6 * pxPerMm); ctx.lineTo(167 * pxPerMm, 287 * pxPerMm); ctx.stroke();
+        ctx.fillStyle = '#94a3b8'; ctx.font = 'bold 10px sans-serif';
+        ctx.fillText('MY NOTES / TRICKS', 170 * pxPerMm, 10 * pxPerMm);
         ctx.strokeStyle = '#e2e8f0';
-        for (let ly = 18; ly < 284; ly += 8) {
-          ctx.beginPath();
-          ctx.moveTo(169 * pxPerMm, ly * pxPerMm);
-          ctx.lineTo(204 * pxPerMm, ly * pxPerMm);
-          ctx.stroke();
+        for (let ly = 17; ly < 285; ly += 8) {
+          ctx.beginPath(); ctx.moveTo(169 * pxPerMm, ly * pxPerMm); ctx.lineTo(204 * pxPerMm, ly * pxPerMm); ctx.stroke();
         }
-      }
-
-      if (opts.layout === 'flow-2') {
-        const availW = 210 - 7 - (opts.penMargin ? 45 : 7);
-        const midX = (7 + availW / 2) * pxPerMm;
-        ctx.strokeStyle = '#e2e8f0';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(midX, 7 * pxPerMm);
-        ctx.lineTo(midX, 286 * pxPerMm);
-        ctx.stroke();
       }
 
       for (const item of pg.items) {
@@ -860,22 +1140,78 @@
           const img = new Image();
           img.onload = () => {
             ctx.drawImage(img, item.x * pxPerMm, item.y * pxPerMm, item.w * pxPerMm, item.h * pxPerMm);
-            ctx.strokeStyle = '#e2e8f0';
-            ctx.lineWidth = 0.8;
+            ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 0.8;
             ctx.strokeRect(item.x * pxPerMm, item.y * pxPerMm, item.w * pxPerMm, item.h * pxPerMm);
-            ctx.fillStyle = '#94a3b8';
-            ctx.font = '9px sans-serif';
-            ctx.fillText(`#${item.block.pageNum}`, (item.x + 1) * pxPerMm, (item.y + 3) * pxPerMm);
+            ctx.fillStyle = '#94a3b8'; ctx.font = '9px sans-serif';
+            ctx.fillText(`#${item.block.pageNum}`, (item.x + 0.8) * pxPerMm, (item.y + 2.8) * pxPerMm);
             resolve();
           };
           img.src = item.block.dataUrl;
         });
       }
 
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '10px sans-serif';
-      ctx.fillText(`Page ${idx + 1} of ${lastPackedPages.length}  •  NotePress Pro`, 7 * pxPerMm, 293 * pxPerMm);
+      ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif';
+      ctx.fillText(`Page ${idx + 1} of ${lastPackedPages.length}  •  NotePress Pro v3`, 6 * pxPerMm, 293.5 * pxPerMm);
     }
+
+    // Slide Manager Modal Logic
+    function openSlidesModal() {
+      const grid = el('slidesGrid');
+      grid.innerHTML = '';
+      const validSlides = cachedPages.filter(p => p.blocks.length > 0);
+      const updateModalCount = () => {
+        const active = validSlides.filter(p => p.enabled).length;
+        el('modalCountLabel').textContent = `${active} / ${validSlides.length} slides selected for printing`;
+      };
+      updateModalCount();
+
+      validSlides.forEach((p) => {
+        const card = document.createElement('label');
+        card.className = `relative flex flex-col border rounded-xl p-2 cursor-pointer transition ${p.enabled ? 'border-indigo-500 bg-slate-900' : 'border-slate-800 bg-slate-950 opacity-50'}`;
+
+        const top = document.createElement('div');
+        top.className = 'flex items-center justify-between mb-1.5 text-[11px]';
+        top.innerHTML = `<span class="font-bold text-slate-200">Slide #${p.pageNum}</span>` +
+          (p.reason ? `<span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">${p.reason}</span>` : '');
+
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = p.enabled;
+        cb.className = 'accent-indigo-500 w-4 h-4';
+        cb.addEventListener('change', () => {
+          p.enabled = cb.checked;
+          card.className = `relative flex flex-col border rounded-xl p-2 cursor-pointer transition ${p.enabled ? 'border-indigo-500 bg-slate-900' : 'border-slate-800 bg-slate-950 opacity-50'}`;
+          updateModalCount();
+        });
+        top.appendChild(cb);
+
+        const img = document.createElement('img');
+        img.src = p.blocks[0].dataUrl;
+        img.loading = 'lazy';
+        img.className = 'w-full h-28 object-contain bg-white rounded border border-slate-700';
+
+        card.appendChild(top);
+        card.appendChild(img);
+        grid.appendChild(card);
+      });
+
+      el('slidesModal').classList.remove('hidden');
+    }
+
+    el('manageSlidesBtn').addEventListener('click', openSlidesModal);
+    el('modalCloseBtn').addEventListener('click', () => el('slidesModal').classList.add('hidden'));
+    el('modalSelectAll').addEventListener('click', () => {
+      cachedPages.forEach(p => { if (p.blocks.length > 0 && !p.reason) p.enabled = true; });
+      openSlidesModal();
+    });
+    el('modalUncheckSmall').addEventListener('click', () => {
+      cachedPages.forEach(p => { if (p.inkRatio < 0.018) p.enabled = false; });
+      openSlidesModal();
+    });
+    el('modalApplyBtn').addEventListener('click', async () => {
+      el('slidesModal').classList.add('hidden');
+      await instantRepackIfReady();
+    });
 
     el('previewBtn').addEventListener('click', () => runPipeline(false));
     el('exportBtn').addEventListener('click', () => runPipeline(true));
