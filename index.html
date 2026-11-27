@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NotePress Pro — Smart Blackboard Notes to Printable PDF</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; }
+    .a4-canvas { box-shadow: 0 10px 30px rgba(0,0,0,0.35); background: #fff; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center font-black text-white text-lg">N</div>
+        <div>
+          <h1 class="font-bold text-lg leading-tight tracking-tight">NotePress <span class="text-indigo-400">Pro</span></h1>
+          <p class="text-[11px] text-slate-400">Blackboard PDF → Big-Font Printable Book</p>
+        </div>
+      </div>
+      <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-medium">
+        100% Free • Runs Offline in Browser
+      </span>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- Left Controls Panel -->
+    <section class="lg:col-span-4 space-y-4">
+
+      <!-- Upload Box -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">1. Upload Coaching / Board PDF</label>
+        <label id="dropZone" class="flex flex-col items-center justify-center border-2 border-dashed border-slate-700 hover:border-indigo-500 rounded-xl p-6 cursor-pointer transition bg-slate-950/60 text-center">
+          <input id="pdfInput" type="file" accept="application/pdf" class="hidden" />
+          <div class="text-3xl mb-1">📄</div>
+          <p id="fileNameLabel" class="text-sm font-medium text-slate-200">Click to select PDF (up to 500+ pages)</p>
+          <p id="fileMetaLabel" class="text-xs text-slate-400 mt-1">PW, Unacademy, Allen, SSC, NEET/JEE Notes</p>
+        </label>
+      </div>
+
+      <!-- Smart Settings -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">2. Smart Print Settings</span>
+          <span class="text-[11px] text-indigo-400">Anti-Blackbox Engine ON</span>
+        </div>
+
+        <!-- Page Range -->
+        <div>
+          <label class="block text-xs text-slate-300 mb-1 font-medium">Pages to Process (e.g. <code class="text-indigo-300">all</code> ya <code class="text-indigo-300">1-20, 102-115</code>)</label>
+          <input id="pageRange" type="text" value="1-15" placeholder="all or 1-20"
+            class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+          <div class="flex gap-2 mt-1.5">
+            <button type="button" onclick="setRange('1-15')" class="text-[11px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">Demo (1-15)</button>
+            <button type="button" onclick="setRange('102-116')" class="text-[11px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">Graphs Test</button>
+            <button type="button" onclick="setRange('all')" class="text-[11px] px-2 py-0.5 rounded bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 font-medium">All Pages</button>
+          </div>
+        </div>
+
+        <!-- Layout Mode -->
+        <div>
+          <label class="block text-xs text-slate-300 mb-1 font-medium">Layout Mode (Font Size vs Pages)</label>
+          <select id="layoutMode" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+            <option value="flow-2" selected>2-Column Tetris Flow (Best: Max Saving + Big Font)</option>
+            <option value="flow-1">Book Flow — Extra Large Font (Pen-Friendly)</option>
+            <option value="grid-4">Clean Auto-Cropped 4-in-1 Grid</option>
+            <option value="grid-6">Clean Auto-Cropped 6-in-1 Grid</option>
+          </select>
+        </div>
+
+        <!-- Ink & Color -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-slate-300 mb-1 font-medium">Ink Mode</label>
+            <select id="colorMode" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-white">
+              <option value="bw" selected>Jet-Black B&W (Sharp)</option>
+              <option value="color">Smart Color (Readable)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-slate-300 mb-1 font-medium">Ink Boldness</label>
+            <select id="boldLevel" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-white">
+              <option value="0">Normal</option>
+              <option value="1" selected>Bold (Highlighter Safe)</option>
+              <option value="2">Extra Bold</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Checkboxes -->
+        <div class="space-y-2.5 pt-1 text-xs text-slate-200">
+          <label class="flex items-center justify-between bg-slate-950/70 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer">
+            <span>✂️ Auto-Crop & Split 2-Col Slides</span>
+            <input id="autoSplit" type="checkbox" checked class="accent-indigo-500 w-4 h-4" />
+          </label>
+          <label class="flex items-center justify-between bg-slate-950/70 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer">
+            <span>🧹 Auto-Skip Duplicate / Blank Slides</span>
+            <input id="skipDupes" type="checkbox" checked class="accent-indigo-500 w-4 h-4" />
+          </label>
+          <label class="flex items-center justify-between bg-slate-950/70 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer">
+            <span>🚫 Hide Top-Right Coaching Logo</span>
+            <input id="hideLogo" type="checkbox" checked class="accent-indigo-500 w-4 h-4" />
+          </label>
+          <label class="flex items-center justify-between bg-slate-950/70 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer">
+            <span>✍️ Add Side Pen-Margin (Cornell Notes)</span>
+            <input id="penMargin" type="checkbox" class="accent-indigo-500 w-4 h-4" />
+          </label>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="grid grid-cols-2 gap-2.5 pt-2">
+          <button id="previewBtn" disabled
+            class="py-2.5 px-3 rounded-xl font-semibold text-sm bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-white transition">
+            👁️ Live Preview
+          </button>
+          <button id="exportBtn" disabled
+            class="py-2.5 px-3 rounded-xl font-semibold text-sm bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white transition shadow-lg shadow-indigo-600/20">
+            ⬇️ Download PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Progress & Stats -->
+      <div id="statusCard" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+        <div class="flex justify-between items-center text-xs">
+          <span id="statusText" class="font-medium text-indigo-300">Processing...</span>
+          <span id="statusPct" class="font-bold text-white">0%</span>
+        </div>
+        <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
+          <div id="progressBar" class="bg-indigo-500 h-2.5 rounded-full transition-all duration-150" style="width: 0%"></div>
+        </div>
+        <div id="statsSummary" class="hidden grid grid-cols-3 gap-2 text-center pt-1">
+          <div class="bg-slate-950 rounded-lg p-2 border border-slate-800">
+            <div id="statInput" class="text-base font-bold text-white">0</div>
+            <div class="text-[10px] text-slate-400">Input Slides</div>
+          </div>
+          <div class="bg-slate-950 rounded-lg p-2 border border-slate-800">
+            <div id="statOutput" class="text-base font-bold text-emerald-400">0</div>
+            <div class="text-[10px] text-slate-400">A4 Pages</div>
+          </div>
+          <div class="bg-slate-950 rounded-lg p-2 border border-slate-800">
+            <div id="statSaved" class="text-base font-bold text-amber-400">0%</div>
+            <div class="text-[10px] text-slate-400">Paper Saved</div>
+          </div>
+        </div>
+        <p id="skippedInfo" class="hidden text-[11px] text-slate-400 text-center"></p>
+      </div>
+    </section>
+
+    <!-- Right Preview Panel -->
+    <section class="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col min-h-[540px]">
+      <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
+        <div>
+          <h2 class="font-semibold text-sm text-white">Live Printable A4 Preview</h2>
+          <p class="text-xs text-slate-400">Jo yahan dikhega, bilkul wahi crisp print PDF mein niklega</p>
+        </div>
+        <div id="previewNav" class="hidden items-center gap-2">
+          <button id="prevPageBtn" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs">◀ Prev</button>
+          <span id="previewPageLabel" class="text-xs font-medium text-slate-300">Page 1 / 1</span>
+          <button id="nextPageBtn" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs">Next ▶</button>
+        </div>
+      </div>
+
+      <div id="previewArea" class="flex-1 flex items-center justify-center p-4 overflow-auto bg-slate-950/70 rounded-xl mt-3">
+        <div id="emptyState" class="text-center max-w-md space-y-2">
+          <div class="text-5xl">✨</div>
+          <h3 class="font-semibold text-slate-200">PDF Upload karo aur Magic dekho</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Normal apps sirf slides ko chhota kar dete hain. NotePress har slide ki khali black space kaat kar, white cards ko bina kaala kiye, aur patle ink ko bold karke bade aksharon mein book jaisa pack karta hai.
+          </p>
+        </div>
+        <canvas id="a4PreviewCanvas" class="hidden a4-canvas max-w-full rounded"></canvas>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    let pdfDoc = null;
+    let totalPdfPages = 0;
+    let uploadedFileName = 'Notes';
+    let lastPackedPages = [];
+    let currentPreviewIdx = 0;
+
+    const el = (id) => document.getElementById(id);
+
+    function setRange(val) {
+      el('pageRange').value = val;
+    }
+
+    // Upload handler
+    el('pdfInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      uploadedFileName = file.name.replace(/\.pdf$/i, '');
+      el('fileNameLabel').textContent = file.name;
+      el('fileMetaLabel').textContent = 'Loading PDF structure...';
+      try {
+        const buffer = await file.arrayBuffer();
+        pdfDoc = await pdfjsLib.getDocument({ data: buffer }).promise;
+        totalPdfPages = pdfDoc.numPages;
+        el('fileMetaLabel').textContent = `✅ ${totalPdfPages} Pages Ready (${(file.size / 1024 / 1024).toFixed(1)} MB)`;
+        el('previewBtn').disabled = false;
+        el('exportBtn').disabled = false;
+        if (totalPdfPages <= 25) el('pageRange').value = 'all';
+      } catch (err) {
+        alert('PDF load karne mein error aaya: ' + err.message);
+        el('fileMetaLabel').textContent = '❌ Invalid or protected PDF';
+      }
+    });
+
+    function parsePageRange(str, maxPages) {
+      const clean = (str || 'all').trim().toLowerCase();
+      if (!clean || clean === 'all') {
+        return Array.from({ length: maxPages }, (_, i) => i + 1);
+      }
+      const set = new Set();
+      clean.split(',').forEach(part => {
+        const p = part.trim();
+        if (p.includes('-')) {
+          let [a, b] = p.split('-').map(n => parseInt(n.trim(), 10));
+          if (!isNaN(a) && !isNaN(b)) {
+            a = Math.max(1, Math.min(maxPages, a));
+            b = Math.max(1, Math.min(maxPages, b));
+            for (let i = Math.min(a, b); i <= Math.max(a, b); i++) set.add(i);
+          }
+        } else {
+          const n = parseInt(p, 10);
+          if (!isNaN(n) && n >= 1 && n <= maxPages) set.add(n);
+        }
+      });
+      return Array.from(set).sort((a, b) => a - b);
+    }
+
+    function getOptions() {
+      return {
+        layout: el('layoutMode').value,
+        colorMode: el('colorMode').value,
+        bold: parseInt(el('boldLevel').value, 10),
+        autoSplit: el('autoSplit').checked,
+        skipDupes: el('skipDupes').checked,
+        hideLogo: el('hideLogo').checked,
+        penMargin: el('penMargin').checked
+      };
+    }
+
+    // Hue-preserving dark-to-light color mapping
+    function rgbToHsl(r, g, b) {
+      r /= 255; g /= 255; b /= 255;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let h = 0, s = 0, l = (max + min) / 2;
+      if (max !== min) {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+        else if (max === g) h = (b - r) / d + 2;
+        else h = (r - g) / d + 4;
+        h /= 6;
+      }
+      return [h, s, l];
+    }
+
+    function hslToRgb(h, s, l) {
+      let r, g, b;
+      if (s === 0) { r = g = b = l; }
+      else {
+        const hue2rgb = (p, q, t) => {
+          if (t < 0) t += 1;
+          if (t > 1) t -= 1;
+          if (t < 1/6) return p + (q - p) * 6 * t;
+          if (t < 1/2) return q;
+          if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+          return p;
+        };
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+      }
+      return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+    }
+
+    // Core Smart Engine: White-Card Safe Invert + Chalk Sharpener + Boldener
+    function cleanSlidePixels(imgData, opts) {
+      const w = imgData.width, h = imgData.height, d = imgData.data;
+
+      // 1. Coarse grid to detect embedded WHITE CARDS vs DARK BOARD
+      const cell = Math.max(16, Math.round(w / 48));
+      const cols = Math.ceil(w / cell);
+      const rows = Math.ceil(h / cell);
+      const grid = new Uint8Array(cols * rows);
+
+      for (let gy = 0; gy < rows; gy++) {
+        const y0 = gy * cell, y1 = Math.min(h, y0 + cell);
+        for (let gx = 0; gx < cols; gx++) {
+          const x0 = gx * cell, x1 = Math.min(w, x0 + cell);
+          let bright = 0, total = 0;
+          for (let y = y0; y < y1; y += 2) {
+            for (let x = x0; x < x1; x += 2) {
+              const i = (y * w + x) * 4;
+              const lum = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
+              if (lum > 185) bright++;
+              total++;
+            }
+          }
+          if (total > 0 && (bright / total) > 0.42) grid[gy * cols + gx] = 1;
+        }
+      }
+
+      // Fill interior holes inside white cards (dense graphs/text inside white cards)
+      const gridFilled = new Uint8Array(grid);
+      for (let gy = 1; gy < rows - 1; gy++) {
+        for (let gx = 1; gx < cols - 1; gx++) {
+          if (grid[gy * cols + gx] === 0) {
+            const n = grid[(gy-1)*cols+gx] + grid[(gy+1)*cols+gx] + grid[gy*cols+gx-1] + grid[gy*cols+gx+1];
+            if (n >= 3) gridFilled[gy * cols + gx] = 1;
+          }
+        }
+      }
+
+      const logoX = Math.floor(w * 0.922);
+      const logoY = Math.floor(h * 0.132);
+
+      // 2. Clean pixels & build 64x36 fingerprint mask for duplicate detection
+      const mW = 64, mH = 36;
+      const mask = new Uint8Array(mW * mH);
+      let inkPixels = 0;
+
+      for (let y = 0; y < h; y++) {
+        const gy = Math.floor(y / cell) * cols;
+        const my = Math.min(mH - 1, Math.floor((y * mH) / h)) * mW;
+        for (let x = 0; x < w; x++) {
+          const i = (y * w + x) * 4;
+
+          if (opts.hideLogo && x >= logoX && y <= logoY) {
+            d[i] = d[i+1] = d[i+2] = 255;
+            d[i+3] = 255;
+            continue;
+          }
+
+          const r = d[i], g = d[i+1], b = d[i+2];
+          const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+          const isLightRegion = gridFilled[gy + Math.floor(x / cell)] === 1;
+
+          let nr = 255, ng = 255, nb = 255;
+
+          if (isLightRegion) {
+            // Preserve white card: keep background white, sharpen dark/colored ink
+            if (lum > 218) {
+              nr = ng = nb = 255;
+            } else if (opts.colorMode === 'bw') {
+              const minC = Math.min(r, g, b);
+              const val = Math.max(0, Math.min(255, Math.round((Math.min(lum, minC * 1.15) - 25) * 1.15)));
+              nr = ng = nb = val;
+            } else {
+              nr = Math.max(0, Math.round(r * 0.85));
+              ng = Math.max(0, Math.round(g * 0.85));
+              nb = Math.max(0, Math.round(b * 0.85));
+            }
+          } else {
+            // Dark board / Maroon slide: background -> pure white, chalk -> crisp dark ink
+            const maxC = Math.max(r, g, b);
+            const isMaroonBg = (lum < 62 && (r - b) > 22 && g < 48);
+            if ((lum < 48 && maxC < 88) || isMaroonBg) {
+              nr = ng = nb = 255;
+            } else if (opts.colorMode === 'bw') {
+              const strength = Math.max(lum, maxC * 0.92);
+              const val = Math.max(0, Math.min(255, Math.round(255 - (strength - 42) * 1.55)));
+              nr = ng = nb = val;
+            } else {
+              const [hh, ss, ll] = rgbToHsl(r, g, b);
+              const newL = Math.max(0.05, Math.min(0.42, (1 - ll) * 0.62));
+              const newS = ss < 0.15 ? 0 : Math.min(1, ss * 1.15);
+              [nr, ng, nb] = hslToRgb(hh, newS, newL);
+            }
+          }
+
+          d[i] = nr; d[i+1] = ng; d[i+2] = nb; d[i+3] = 255;
+          if (nr < 200 || ng < 200 || nb < 200) {
+            inkPixels++;
+            mask[my + Math.min(mW - 1, Math.floor((x * mW) / w))] = 1;
+          }
+        }
+      }
+
+      // 3. Ink Boldener (thickens thin stylus writing for print & highlighters)
+      if (opts.bold > 0) {
+        const src = new Uint8ClampedArray(d);
+        for (let y = 1; y < h - 1; y++) {
+          for (let x = 1; x < w - 1; x++) {
+            const i = (y * w + x) * 4;
+            const iR = i + 4;
+            const iB = i + w * 4;
+            if (opts.bold === 1) {
+              d[i]   = Math.min(src[i],   src[iR],   src[iB]);
+              d[i+1] = Math.min(src[i+1], src[iR+1], src[iB+1]);
+              d[i+2] = Math.min(src[i+2], src[iR+2], src[iB+2]);
+            } else {
+              const iL = i - 4, iT = i - w * 4;
+              d[i]   = Math.min(src[i],   src[iR],   src[iL],   src[iT],   src[iB]);
+              d[i+1] = Math.min(src[i+1], src[iR+1], src[iL+1], src[iT+1], src[iB+1]);
+              d[i+2] = Math.min(src[i+2], src[iR+2], src[iL+2], src[iT+2], src[iB+2]);
+            }
+          }
+        }
+      }
+
+      let maskCount = 0;
+      for (let k = 0; k < mask.length; k++) maskCount += mask[k];
+      return { mask, maskCount, inkPixels };
+    }
+
+    // Tight bounding box inside a region
+    function getTightBox(imgData, xStart, yStart, xEnd, yEnd) {
+      const w = imgData.width, d = imgData.data;
+      const rowInk = new Uint16Array(yEnd - yStart);
+      const colInk = new Uint16Array(xEnd - xStart);
+
+      for (let y = yStart; y < yEnd; y++) {
+        let rc = 0;
+        for (let x = xStart; x < xEnd; x++) {
+          const i = (y * w + x) * 4;
+          if (d[i] < 225 || d[i+1] < 225 || d[i+2] < 225) {
+            rc++;
+            colInk[x - xStart]++;
+          }
+        }
+        rowInk[y - yStart] = rc;
+      }
+
+      let minY = -1, maxY = -1, minX = -1, maxX = -1;
+      for (let y = 0; y < rowInk.length; y++) { if (rowInk[y] >= 2) { minY = y + yStart; break; } }
+      for (let y = rowInk.length - 1; y >= 0; y--) { if (rowInk[y] >= 2) { maxY = y + yStart; break; } }
+      for (let x = 0; x < colInk.length; x++) { if (colInk[x] >= 2) { minX = x + xStart; break; } }
+      for (let x = colInk.length - 1; x >= 0; x--) { if (colInk[x] >= 2) { maxX = x + xStart; break; } }
+
+      if (minX < 0 || maxX - minX < 18 || maxY - minY < 18) return null;
+
+      const pad = 12;
+      return {
+        x: Math.max(0, minX - pad),
+        y: Math.max(0, minY - pad),
+        w: Math.min(imgData.width, maxX + pad) - Math.max(0, minX - pad),
+        h: Math.min(imgData.height, maxY + pad) - Math.max(0, minY - pad)
+      };
+    }
+
+    // Detect clean vertical gutter in wide 2-column coaching slides
+    function splitIfTwoColumn(imgData, box, autoSplit) {
+      if (!autoSplit || (box.w / box.h) < 1.38 || box.w < 420) return [box];
+      const w = imgData.width, d = imgData.data;
+      const searchStart = box.x + Math.floor(box.w * 0.36);
+      const searchEnd = box.x + Math.floor(box.w * 0.64);
+      const colDensity = [];
+
+      for (let x = searchStart; x < searchEnd; x++) {
+        let dark = 0;
+        for (let y = box.y; y < box.y + box.h; y += 2) {
+          const i = (y * w + x) * 4;
+          if (d[i] < 220 || d[i+1] < 220 || d[i+2] < 220) dark++;
+        }
+        colDensity.push(dark / (box.h / 2));
+      }
+
+      // Find cleanest 18px vertical strip (even works across dotted divider lines)
+      const win = 18;
+      let bestScore = 999, bestIdx = -1;
+      for (let i = 0; i <= colDensity.length - win; i++) {
+        let sum = 0;
+        for (let k = 0; k < win; k++) sum += colDensity[i + k];
+        const avg = sum / win;
+        if (avg < bestScore) { bestScore = avg; bestIdx = i; }
+      }
+
+      if (bestScore < 0.012 && bestIdx >= 0) {
+        const splitX = searchStart + bestIdx + Math.floor(win / 2);
+        const left = getTightBox(imgData, box.x, box.y, splitX - 4, box.y + box.h);
+        const right = getTightBox(imgData, splitX + 4, box.y, box.x + box.w, box.y + box.h);
+        if (left && right && left.w > 110 && right.w > 110) {
+          return [left, right];
+        }
+      }
+      return [box];
+    }
+
+    // Progressive duplicate check (e.g., Question slide -> Question + Solution slide)
+    function isProgressiveDuplicate(prev, curr) {
+      if (!prev || !curr || prev.maskCount < 10) return false;
+      if (curr.maskCount < prev.maskCount * 0.98) return false;
+      const mW = 64, mH = 36;
+      let overlap = 0;
+      for (let y = 0; y < mH; y++) {
+        for (let x = 0; x < mW; x++) {
+          if (prev.mask[y * mW + x] === 1) {
+            let found = false;
+            for (let dy = -1; dy <= 1 && !found; dy++) {
+              for (let dx = -1; dx <= 1 && !found; dx++) {
+                const ny = y + dy, nx = x + dx;
+                if (ny >= 0 && ny < mH && nx >= 0 && nx < mW && curr.mask[ny * mW + nx] === 1) {
+                  found = true;
+                }
+              }
+            }
+            if (found) overlap++;
+          }
+        }
+      }
+      return (overlap / prev.maskCount) >= 0.82;
+    }
+
+    // Render & process one PDF page
+    async function processSinglePage(pageNum, opts, scale) {
+      const page = await pdfDoc.getPage(pageNum);
+      const viewport = page.getViewport({ scale });
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(viewport.width);
+      canvas.height = Math.round(viewport.height);
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      await page.render({ canvasContext: ctx, viewport }).promise;
+      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const meta = cleanSlidePixels(imgData, opts);
+      ctx.putImageData(imgData, 0, 0);
+
+      const mainBox = getTightBox(imgData, 0, 0, canvas.width, canvas.height);
+      const isBlank = !mainBox || meta.inkPixels < (canvas.width * canvas.height * 0.0018);
+
+      const blocks = [];
+      if (!isBlank) {
+        const subBoxes = splitIfTwoColumn(imgData, mainBox, opts.autoSplit);
+        for (const b of subBoxes) {
+          const c2 = document.createElement('canvas');
+          c2.width = b.w;
+          c2.height = b.h;
+          const ctx2 = c2.getContext('2d');
+          ctx2.fillStyle = '#ffffff';
+          ctx2.fillRect(0, 0, b.w, b.h);
+          ctx2.drawImage(canvas, b.x, b.y, b.w, b.h, 0, 0, b.w, b.h);
+          blocks.push({
+            dataUrl: c2.toDataURL('image/jpeg', 0.85),
+            w: b.w,
+            h: b.h,
+            origW: canvas.width,
+            origH: canvas.height,
+            pageNum
+          });
+          c2.width = 0; c2.height = 0;
+        }
+      }
+
+      canvas.width = 0; canvas.height = 0;
+      return { pageNum, isBlank, mask: meta.mask, maskCount: meta.maskCount, blocks };
+    }
+
+    // Smart A4 Layout Packer (returns exact mm positions for both Preview & jsPDF)
+    function packBlocksToA4(blocks, opts) {
+      const pageW = 210, pageH = 297;
+      const mL = 7, mT = 7, mB = 11;
+      const mR = opts.penMargin ? 45 : 7;
+      const availW = pageW - mL - mR;
+      const availH = pageH - mT - mB;
+      const pages = [];
+
+      if (opts.layout === 'grid-4' || opts.layout === 'grid-6') {
+        const cols = 2, rows = opts.layout === 'grid-4' ? 2 : 3;
+        const perPage = cols * rows;
+        const gap = 4;
+        const cellW = (availW - gap * (cols - 1)) / cols;
+        const cellH = (availH - gap * (rows - 1)) / rows;
+
+        for (let i = 0; i < blocks.length; i += perPage) {
+          const items = [];
+          for (let j = 0; j < perPage && (i + j) < blocks.length; j++) {
+            const b = blocks[i + j];
+            const r = Math.floor(j / cols), c = j % cols;
+            const scale = Math.min(cellW / b.w, cellH / b.h);
+            const dw = b.w * scale, dh = b.h * scale;
+            items.push({
+              block: b,
+              x: mL + c * (cellW + gap) + (cellW - dw) / 2,
+              y: mT + r * (cellH + gap) + (cellH - dh) / 2,
+              w: dw, h: dh
+            });
+          }
+          pages.push({ items });
+        }
+        return pages;
+      }
+
+      if (opts.layout === 'flow-1') {
+        // Book Flow: Extra large pen-friendly font with smart pairing for small blocks
+        let curPage = { items: [] };
+        let curY = mT, rowX = mL, rowH = 0;
+        const gapX = 4, gapY = 4;
+
+        for (const b of blocks) {
+          const isWide = (b.w / b.origW) > 0.56;
+          const maxMmPerPx = (availW / b.origW) * 1.48;
+          let targetW = isWide ? availW : Math.min(availW, Math.max((availW - gapX) / 2, b.w * maxMmPerPx));
+          let scale = Math.min(targetW / b.w, maxMmPerPx);
+          let dw = b.w * scale, dh = b.h * scale;
+
+          if (dh > availH) {
+            const s = availH / dh;
+            dw *= s; dh *= s;
+          }
+
+          // Check if fits on current shelf
+          if (rowX > mL && (rowX + dw > mL + availW + 0.5)) {
+            curY += rowH + gapY;
+            rowX = mL;
+            rowH = 0;
+          }
+          if (curY + dh > pageH - mB) {
+            if (curPage.items.length > 0) pages.push(curPage);
+            curPage = { items: [] };
+            curY = mT; rowX = mL; rowH = 0;
+          }
+
+          curPage.items.push({ block: b, x: rowX, y: curY, w: dw, h: dh });
+          rowX += dw + gapX;
+          rowH = Math.max(rowH, dh);
+        }
+        if (curPage.items.length > 0) pages.push(curPage);
+        return pages;
+      }
+
+      // Default: 'flow-2' — 2-Column Tetris Masonry (Max Saving + Huge Readability)
+      const gapX = 4, gapY = 3.8;
+      const colW = (availW - gapX) / 2;
+      let curPage = { items: [] };
+      let colY = [mT, mT];
+
+      for (const b of blocks) {
+        const maxMmPerPx = colW / (b.origW * 0.44);
+        const scale = Math.min(colW / b.w, maxMmPerPx);
+        let dw = b.w * scale, dh = b.h * scale;
+        if (dh > availH) {
+          const s = availH / dh;
+          dw *= s; dh *= s;
+        }
+
+        let ci = colY[0] <= colY[1] ? 0 : 1;
+        if (colY[ci] + dh > pageH - mB) {
+          const alt = 1 - ci;
+          if (colY[alt] + dh <= pageH - mB) {
+            ci = alt;
+          } else {
+            if (curPage.items.length > 0) pages.push(curPage);
+            curPage = { items: [] };
+            colY = [mT, mT];
+            ci = 0;
+          }
+        }
+
+        const x = mL + ci * (colW + gapX) + (colW - dw) / 2;
+        curPage.items.push({ block: b, x, y: colY[ci], w: dw, h: dh });
+        colY[ci] += dh + gapY;
+      }
+      if (curPage.items.length > 0) pages.push(curPage);
+      return pages;
+    }
+
+    // Run full pipeline
+    async function runPipeline(isExport) {
+      if (!pdfDoc) return;
+      const opts = getOptions();
+      const pageNums = parsePageRange(el('pageRange').value, totalPdfPages);
+      if (pageNums.length === 0) {
+        alert('Sahi page range daalo (e.g. 1-20 ya all)');
+        return;
+      }
+
+      el('previewBtn').disabled = true;
+      el('exportBtn').disabled = true;
+      el('statusCard').classList.remove('hidden');
+      el('statsSummary').classList.add('hidden');
+      el('skippedInfo').classList.add('hidden');
+
+      const renderScale = isExport ? 1.85 : 1.45;
+      const allBlocks = [];
+      let pending = null;
+      let skippedBlank = 0, skippedDupe = 0;
+
+      for (let idx = 0; idx < pageNums.length; idx++) {
+        const pNum = pageNums[idx];
+        const pct = Math.round(((idx + 1) / pageNums.length) * 100);
+        el('statusText').textContent = `Cleaning & Cropping Slide ${pNum} (${idx + 1}/${pageNums.length})...`;
+        el('statusPct').textContent = pct + '%';
+        el('progressBar').style.width = pct + '%';
+
+        const curr = await processSinglePage(pNum, opts, renderScale);
+
+        if (opts.skipDupes && curr.isBlank) {
+          skippedBlank++;
+          continue;
+        }
+
+        if (pending) {
+          if (opts.skipDupes && isProgressiveDuplicate(pending, curr)) {
+            skippedDupe++;
+            pending = curr;
+          } else {
+            allBlocks.push(...pending.blocks);
+            pending = curr;
+          }
+        } else {
+          pending = curr;
+        }
+
+        await new Promise(r => setTimeout(r, 0)); // keep UI smooth
+      }
+      if (pending) allBlocks.push(...pending.blocks);
+
+      el('statusText').textContent = 'Packing notes into A4 book pages...';
+      await new Promise(r => setTimeout(r, 15));
+
+      const packedPages = packBlocksToA4(allBlocks, opts);
+      lastPackedPages = packedPages;
+      const savedPct = pageNums.length > 0 ? Math.max(0, Math.round((1 - packedPages.length / pageNums.length) * 100)) : 0;
+
+      el('statInput').textContent = pageNums.length;
+      el('statOutput').textContent = packedPages.length;
+      el('statSaved').textContent = savedPct + '%';
+      el('statsSummary').classList.remove('hidden');
+
+      if (skippedBlank + skippedDupe > 0) {
+        el('skippedInfo').textContent = `Auto-skipped ${skippedDupe} duplicate/half slides & ${skippedBlank} blank slides.`;
+        el('skippedInfo').classList.remove('hidden');
+      }
+
+      if (packedPages.length > 0) {
+        currentPreviewIdx = 0;
+        await renderA4Preview(0, opts, savedPct);
+      }
+
+      if (isExport && packedPages.length > 0) {
+        el('statusText').textContent = 'Building final HD Printable PDF...';
+        await new Promise(r => setTimeout(r, 20));
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
+
+        for (let p = 0; p < packedPages.length; p++) {
+          if (p > 0) doc.addPage();
+          const pg = packedPages[p];
+
+          // Optional Cornell Pen-Margin
+          if (opts.penMargin) {
+            doc.setDrawColor(195, 195, 195);
+            doc.setLineWidth(0.3);
+            doc.line(167, 7, 167, 286);
+            doc.setFontSize(7.5);
+            doc.setTextColor(120, 120, 120);
+            doc.text('MY NOTES / TRICKS', 170, 11);
+            doc.setDrawColor(232, 232, 232);
+            doc.setLineWidth(0.15);
+            for (let ly = 18; ly < 284; ly += 8) doc.line(169, ly, 204, ly);
+          }
+
+          // Center column divider for 2-column mode
+          if (opts.layout === 'flow-2') {
+            const availW = 210 - 7 - (opts.penMargin ? 45 : 7);
+            const midX = 7 + availW / 2;
+            doc.setDrawColor(225, 225, 225);
+            doc.setLineWidth(0.2);
+            doc.line(midX, 7, midX, 286);
+          }
+
+          for (const item of pg.items) {
+            doc.addImage(item.block.dataUrl, 'JPEG', item.x, item.y, item.w, item.h, undefined, 'FAST');
+            doc.setDrawColor(230, 230, 230);
+            doc.setLineWidth(0.15);
+            doc.rect(item.x, item.y, item.w, item.h);
+            doc.setFontSize(6);
+            doc.setTextColor(150, 150, 150);
+            doc.text(`#${item.block.pageNum}`, item.x + 1, item.y + 2.6);
+          }
+
+          // Footer
+          doc.setFontSize(7);
+          doc.setTextColor(135, 135, 135);
+          doc.text(`Page ${p + 1} of ${packedPages.length}   •   Made with NotePress Pro (Saved ${savedPct}% Pages)`, 7, 293);
+        }
+
+        doc.save(`${uploadedFileName}_Printable_${packedPages.length}pages.pdf`);
+        el('statusText').textContent = `✅ Done! ${pageNums.length} slides → ${packedPages.length} A4 Pages downloaded!`;
+      } else {
+        el('statusText').textContent = `✅ Preview Ready! (${pageNums.length} slides → ${packedPages.length} A4 pages)`;
+      }
+
+      el('previewBtn').disabled = false;
+      el('exportBtn').disabled = false;
+    }
+
+    // Draw A4 page on Live Preview Canvas
+    async function renderA4Preview(idx, opts, savedPct = 0) {
+      const pg = lastPackedPages[idx];
+      if (!pg) return;
+      el('emptyState').classList.add('hidden');
+      const canvas = el('a4PreviewCanvas');
+      canvas.classList.remove('hidden');
+      el('previewNav').classList.remove('hidden');
+      el('previewNav').classList.add('flex');
+      el('previewPageLabel').textContent = `Page ${idx + 1} / ${lastPackedPages.length}`;
+
+      const pxPerMm = 3.5;
+      canvas.width = Math.round(210 * pxPerMm);
+      canvas.height = Math.round(297 * pxPerMm);
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      if (opts.penMargin) {
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(167 * pxPerMm, 7 * pxPerMm);
+        ctx.lineTo(167 * pxPerMm, 286 * pxPerMm);
+        ctx.stroke();
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = 'bold 10px sans-serif';
+        ctx.fillText('MY NOTES / TRICKS', 170 * pxPerMm, 11 * pxPerMm);
+        ctx.strokeStyle = '#e2e8f0';
+        for (let ly = 18; ly < 284; ly += 8) {
+          ctx.beginPath();
+          ctx.moveTo(169 * pxPerMm, ly * pxPerMm);
+          ctx.lineTo(204 * pxPerMm, ly * pxPerMm);
+          ctx.stroke();
+        }
+      }
+
+      if (opts.layout === 'flow-2') {
+        const availW = 210 - 7 - (opts.penMargin ? 45 : 7);
+        const midX = (7 + availW / 2) * pxPerMm;
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(midX, 7 * pxPerMm);
+        ctx.lineTo(midX, 286 * pxPerMm);
+        ctx.stroke();
+      }
+
+      for (const item of pg.items) {
+        await new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            ctx.drawImage(img, item.x * pxPerMm, item.y * pxPerMm, item.w * pxPerMm, item.h * pxPerMm);
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 0.8;
+            ctx.strokeRect(item.x * pxPerMm, item.y * pxPerMm, item.w * pxPerMm, item.h * pxPerMm);
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '9px sans-serif';
+            ctx.fillText(`#${item.block.pageNum}`, (item.x + 1) * pxPerMm, (item.y + 3) * pxPerMm);
+            resolve();
+          };
+          img.src = item.block.dataUrl;
+        });
+      }
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '10px sans-serif';
+      ctx.fillText(`Page ${idx + 1} of ${lastPackedPages.length}  •  NotePress Pro`, 7 * pxPerMm, 293 * pxPerMm);
+    }
+
+    el('previewBtn').addEventListener('click', () => runPipeline(false));
+    el('exportBtn').addEventListener('click', () => runPipeline(true));
+    el('prevPageBtn').addEventListener('click', () => {
+      if (currentPreviewIdx > 0) { currentPreviewIdx--; renderA4Preview(currentPreviewIdx, getOptions()); }
+    });
+    el('nextPageBtn').addEventListener('click', () => {
+      if (currentPreviewIdx < lastPackedPages.length - 1) { currentPreviewIdx++; renderA4Preview(currentPreviewIdx, getOptions()); }
+    });
+  </script>
+</body>
+</html>
