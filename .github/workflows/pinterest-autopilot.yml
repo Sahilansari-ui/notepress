@@ -1,0 +1,43 @@
+name: Pinterest RSS & Pins Autopilot
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 2'
+  push:
+    paths:
+      - 'generate_pins.py'
+      - '.github/workflows/pinterest-autopilot.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build-pins:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Pillow
+        run: pip install pillow
+
+      - name: Generate 30 Pinterest Pins & RSS Feed
+        run: python generate_pins.py
+
+      - name: Commit & Push Pins and RSS
+        run: |
+          git config user.name "NotePress Pinterest Bot"
+          git config user.email "actions@github.com"
+          git add pins/ feed.xml
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Autopilot: generate 30 Pinterest pins and feed.xml"
+            git push
+          else
+            echo "No changes to commit"
+          fi
